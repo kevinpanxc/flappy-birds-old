@@ -74,6 +74,7 @@ $(document).ready(function() {
    socket.emit('register-request', null);
 
    socket.on('register-response', function(data) {
+      alert(data);
       currentstate = states.SplashScreen;
    });
 
@@ -178,7 +179,7 @@ function gameloop() {
    velocity += gravity;
    position += velocity;
    
-   //update the player
+   //update the player 
    updatePlayer(player);
    
    //create the bounding box

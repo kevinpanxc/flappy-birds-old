@@ -14,14 +14,13 @@ console.log("Listening on port " + port);
 
 var pipes = new Array();
 
-var clients = new Array();
+var clients = {};
 
 io.sockets.on('connection', function (socket) {
 
-	generatePipes();
-
 	socket.on('register-request', function (data) {
 		socket.emit('register-response', addNewClient());
+
 	});
 
     // Start listening for mouse move events
@@ -50,7 +49,18 @@ function getPipe(index) {
 }
 
 function addNewClient() {
-	var clientId = clients.length;
-	clients.push({clientId: clientId, y:180, time: 0});
+	var clientId = randomString(16, 'aA');
+	clients[clientId] = {clientId: clientId, y:180, time: 0};
 	return clientId;
+}
+
+function randomString(length, chars) {
+    var mask = '';
+    if (chars.indexOf('a') > -1) mask += 'abcdefghijklmnopqrstuvwxyz';
+    if (chars.indexOf('A') > -1) mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (chars.indexOf('#') > -1) mask += '0123456789';
+    if (chars.indexOf('!') > -1) mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
+    var result = '';
+    for (var i = length; i > 0; --i) result += mask[Math.round(Math.random() * (mask.length - 1))];
+    return result;
 }
