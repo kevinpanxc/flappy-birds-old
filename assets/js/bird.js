@@ -6,6 +6,39 @@ function Bird () {
 	var position = 180;
 	var rotation = 0;
 	var jump = -4.6;
+
+	var DEAD = false;
+	var ALIVE = true;
+
+	this.score = 0;
+
+
+	this.reset = function(){
+		//set the defaults (again)
+	   velocity = 0;
+	   position = 180;
+	   rotation = 0;
+	   score = 0;
+
+	   //update the player in preparation for the next game
+	   $("#player"+playerId).css({ y: 0, x: 0});
+	   this.updateBird();
+	}
+
+	this.jump = function() {
+	   velocity = jump;
+
+	   Sounds.playSoundJump();
+	}
+
+	this.scored = function (){
+	   this.score += 1;
+	   //play score sound
+	   Sounds.playSoundScore();
+
+	   Score.setBigScore(this.score);
+	}
+
    
    	this.updateBird = function(){
 
@@ -23,67 +56,105 @@ function Bird () {
 
 	this.checkAlive = function(){
 	 	var box = document.getElementById("player"+playerId).getBoundingClientRect();
+		
+		var boxDimensions = this.getBoxDimensions(box);
+	  
+	   	if(this.touchGround(box)) return DEAD;
+	   
+	   	if(this.touchCeiling(boxDimensions.boxtop)) this.doNotAllowBirdToFlyHigher();
+
+   		if(this.noPipesYet()) {
+   			return ALIVE;
+   		} else {
+	   		var nextpipe = pipe_data_container.getPipe(0);
+
+	   		var pipeDimensions = this.getPipeDimensions(nextpipe);
+	   
+	   		if(this.didWeCollideWithPipe(boxDimensions, pipeDimensions)) return DEAD;
+	   
+		   	if(this.didWePassPipe(boxDimensions.boxleft, pipeDimensions)) {
+		      	pipe_data_container.removeUsedPipe();
+		      
+		      	this.scored();
+		   	}
+		   	return ALIVE;
+   		}
+	}
+
+	this.touchGround = function (box) {
+		return box.bottom >= $("#land").offset().top;
+	}
+
+	this.touchCeiling = function (boxtop) {
+		var ceiling = $("#ceiling");
+		return boxtop <= (ceiling.offset().top + ceiling.height());
+	}
+
+	this.doNotAllowBirdToFlyHigher = function () {
+		position = 0;
+	}
+
+	this.noPipesYet = function () {
+		return pipe_data_container.getPipe(0) == null;
+	}
+
+	this.getPipeDimensions = function (nextpipe) {
+		var nextpipeupper = nextpipe.children(".pipe_upper");
+
+		var pipetop = nextpipeupper.offset().top + nextpipeupper.height();
+	   	var pipeleft = nextpipeupper.offset().left - 2; // for some reason it starts at the inner pipes offset, not the outer pipes.
+	   	var piperight = pipeleft + pipe_data_container.getPipeWidth();
+	   	var pipebottom = pipetop + pipe_data_container.getPipeHeight();
+
+		return {
+			pipetop : pipetop,
+			pipeleft : pipeleft,
+			piperight : piperight,
+			pipebottom : pipebottom
+		}
+	}
+
+	this.getBoxDimensions = function (box) {
+
 		var origwidth = 34.0;
 	 	var origheight = 24.0;
-	   
+
 		var boxwidth = origwidth - (Math.sin(Math.abs(rotation) / 90) * 8);
 		var boxheight = (origheight + box.height) / 2;
 		var boxleft = ((box.width - boxwidth) / 2) + box.left;
 		var boxtop = ((box.height - boxheight) / 2) + box.top;
 		var boxright = boxleft + boxwidth;
 		var boxbottom = boxtop + boxheight;
-	  
-	   	//did we hit the ground?
-	   	if(box.bottom >= $("#land").offset().top)
-	   	{
-	    	return false;
-	   	}
-	   
-	   	//have they tried to escape through the ceiling? :o
-	   	var ceiling = $("#ceiling");
-	   	if(boxtop <= (ceiling.offset().top + ceiling.height()))
-	      	position = 0;
 
+		return {
+			boxwidth: boxwidth,
+			boxheight: boxheight,
+			boxleft: boxleft,
+			boxtop: boxtop,
+			boxright: boxright,
+			boxbottom: boxbottom
+		}
+	}
 
-	    //we can't go any further without a pipe
-   		if(pipe_data_container.getPipe(0) == null)
-      		return;
-   
-   		//determine the bounding box of the next pipes inner area
-   		var nextpipe = pipe_data_container.getPipe(0);
-   		var nextpipeupper = nextpipe.children(".pipe_upper");
-   
-   		var pipetop = nextpipeupper.offset().top + nextpipeupper.height();
-   		var pipeleft = nextpipeupper.offset().left - 2; // for some reason it starts at the inner pipes offset, not the outer pipes.
-   		var piperight = pipeleft + pipe_data_container.getPipeWidth();
-   		var pipebottom = pipetop + pipe_data_container.getPipeHeight();
-   
+	this.didWeCollideWithPipe = function (boxDimensions, pipeDimensions) {
+		if (boxDimensions.boxright > pipeDimensions.pipeleft) {
+			if (!(boxDimensions.boxtop > pipeDimensions.pipetop && boxDimensions.boxbottom < pipeDimensions.pipebottom)) {
+				return true;
+			}
+		}
+	}
 
-   		//have we gotten inside the pipe yet?
-   		if(boxright > pipeleft)
-   		{
-      		//we're within the pipe, have we passed between upper and lower pipes?
-      		if(boxtop > pipetop && boxbottom < pipebottom)
-      		{
-         		//yeah! we're within bounds
-      		}
-      		else
-      		{
-	         	//no! we touched the pipe
-	         	return false;
-      		}
-   		}
-   
-	   	//have we passed the imminent danger?
-	   	if(boxleft > piperight)
-	   	{
-	      	//yes, remove it
-	      	pipe_data_container.removeUsedPipe();
-	      
-	      	//and score a point
-	      	playerScore();
-	   	}
-	   	return true;
+	this.didWePassPipe = function (boxleft, pipeDimensions) {
+		return boxleft > pipeDimensions.piperight;
+	}
+
+	this.die = function(){
+		//drop the bird to the floor
+	   var playerbottom = $("#player").position().top + $("#player").width(); //we use width because he'll be rotated 90 deg
+	   var floor = $("#flyarea").height();
+	   var movey = Math.max(0, floor - playerbottom);
+
+	   $("#player").transition({ y: movey + 'px', rotate: 90}, 1000, 'easeInOutCubic');
 	}
 
 
