@@ -19,13 +19,36 @@ var clients = {};
 io.sockets.on('connection', function (socket) {
 
 	socket.on('register-request', function (data) {
+		//clients = {};
+		//var clientId = addNewClient();
+		//clients[clientId].time += 2000;
 		socket.emit('register-response', addNewClient());
 
 	});
 
-    // Start listening for mouse move events
     socket.on('pipe-request', function (data) {
     	socket.emit('pipe-response', getPipe(data.index));
+    });
+
+    //asking for all the birds
+    socket.on('sync-request', function(data) {
+    	var clientPackage = {};
+    	for (client in clients) {
+    		if (data != client) {
+    			clients[client].timediff = clients[client].time - clients[data].time;
+    			clientPackage[client] = clients[client];
+    		}
+    	}
+    	socket.emit('sync-response', clientPackage)
+    }); 
+
+    //on bird jump, re-emit
+    socket.on('bird-jump',function(data){
+    	io.sockets.emit('bird-jumped',data);
+    });
+
+    socket.on('bird-death-request',function(data){
+    	io.sockets.emit('bird-death-response',data);
     });
 });
 
@@ -50,7 +73,7 @@ function getPipe(index) {
 
 function addNewClient() {
 	var clientId = randomString(16, 'aA');
-	clients[clientId] = {clientId: clientId, y:180, time: 0};
+	clients[clientId] = {clientId: clientId, velocity: 0, position:90, rotation: 0, time: new Date().getTime()};
 	return clientId;
 }
 

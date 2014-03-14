@@ -24,10 +24,11 @@ var states = Object.freeze({
 
 var currentstate;
 
-var bird = new Bird(Sounds);
+var bird;
+
+var birdArray = {};
 
 var highscore = 0;
-
 var replayclickable = false;
 
 //loops
@@ -37,8 +38,6 @@ var loopPipeloop;
 var socket;
 
 $(document).ready(function() {
-   if(window.location.search == "?debug")
-      debugmode = true;
    if(window.location.search == "?easy")
       pipe_data_container.setEasyMode();
    
@@ -46,19 +45,17 @@ $(document).ready(function() {
    var savedscore = getCookie("highscore");
    if(savedscore != "")
       highscore = parseInt(savedscore);
-   
-   //start with the splash screen
-   showSplash();
 
    currentstate = states.WaitingForServer;
 
-   var url = 'http://localhost:3700'
+   var url = 'http://192.168.101.31:3700'
    socket = io.connect(url);
 
-   socket.emit('register-request', null);
-
    socket.on('register-response', function(data) {
-      alert(data);
+      bird = new Bird(0,180,0,data);
+      showSplash();
+      bird.reset();
+
       currentstate = states.SplashScreen;
    });
 
@@ -68,9 +65,30 @@ $(document).ready(function() {
       pipe_data_container.pushPipe(newpipe);
    });
 
+   socket.on('bird-jumped',function(data){
+      if (data !== bird.playerId) birdArray[data].jump();
+   });
+
+   socket.on('sync-response',function(data){
+      birdArray = {};
+      for (client in data) {
+         addBird(data[client]);
+      }
+   });
+
+   socket.on('bird-death-response', function(data){
+      if (data !== bird.playerId) birdArray[data].die();
+   });
+
    background_animation.endAnimations();
    
 });
+
+function addBird(data) {
+   var bird = new Bird(data.velocity, data.position, data.rotation, data.clientId);
+   bird.addToFlyArea(data.timediff);
+   birdArray[data.clientId] = bird;
+}
 
 function getCookie(cname)
 {
@@ -92,8 +110,7 @@ function setCookie(cname,cvalue,exdays)
    document.cookie = cname + "=" + cvalue + "; " + expires;
 }
 
-function showSplash()
-{
+function showSplash() {
    currentstate = states.SplashScreen;
    
    bird.reset();
@@ -109,10 +126,12 @@ function showSplash()
 
 }
 
-function startGame()
-{
+function startGame() {
    background_animation.startAnimations();
    currentstate = states.GameScreen;
+
+   socket.emit('register-request', null);
+   socket.emit('sync-request', bird.playerId);
    
    //fade out the splash
    $("#splash").stop();
@@ -131,15 +150,19 @@ function startGame()
 }
 
 
-
-function gameloop() {
-   var player = $("#player");
-   
+function gameloop() { 
    bird.updateBird();
+   updateAllBirds();
    if (!bird.checkAlive()){
-      playerDead();
+      killBird();
    }
 
+}
+
+function updateAllBirds() {
+   for (var bird in birdArray) {
+      birdArray[bird].updateBird();
+   }
 }
 
 //Handle space bar
@@ -165,6 +188,7 @@ function screenClick()
 {
    if(currentstate == states.GameScreen)
    {
+      socket.emit('bird-jump',bird.playerId);
       bird.jump();
    }
    else if(currentstate == states.SplashScreen)
@@ -197,9 +221,9 @@ function setMedal()
    return true;
 }
 
-function playerDead()
-{
+function killBird() {
    bird.die();
+   socket.emit('bird-death-request',bird.playerId);
    //stop animating everything!
    background_animation.endAnimations();
 
@@ -273,7 +297,7 @@ function showScore()
          $("#medal").transition({ opacity: 1, scale: 1 }, 1200, 'ease');
       }
    });
-   
+
    //make the replay button clickable
    replayclickable = true;
 }

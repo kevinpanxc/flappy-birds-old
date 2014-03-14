@@ -304,12 +304,6 @@ Screen - Game
    border: 1px solid red;
 }
 
-#player
-{
-   left: 60px;
-   top: 200px;
-}
-
 .bird
 {
    position: absolute;
