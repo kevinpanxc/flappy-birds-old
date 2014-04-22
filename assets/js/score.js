@@ -1,7 +1,9 @@
 var Score = (function () {
 
+	var high_score = 0;
+
 	return {
-		setBigScore : function (score) {
+		display_big_score : function (score) {
 			var elemscore = $("#bigscore");
 			elemscore.empty();
 
@@ -11,27 +13,36 @@ var Score = (function () {
 				elemscore.append("<img src='images/font_big_" + digits[i] + ".png' alt='" + digits[i] + "'>");
 		},
 
-		removeBigScore : function () {
+		remove_big_score : function () {
 			var elemscore = $("#bigscore");
 			elemscore.empty();
 		},
 
-		setSmallScore : function (score) {
+		display_small_score : function (score) {
 			var elemscore = $("#currentscore");
 			elemscore.empty();
 
 			var digits = score.toString().split('');
+
 			for(var i = 0; i < digits.length; i++)
 				elemscore.append("<img src='images/font_small_" + digits[i] + ".png' alt='" + digits[i] + "'>");
 		},
 
-		setHighScore : function (score) {
+		display_high_score : function (score) {
 			var elemscore = $("#highscore");
 			elemscore.empty();
 
-			var digits = highscore.toString().split('');
+			var digits = high_score.toString().split('');
 			for(var i = 0; i < digits.length; i++)
 				elemscore.append("<img src='images/font_small_" + digits[i] + ".png' alt='" + digits[i] + "'>");
+		}, 
+
+		get_high_score : function () {
+			return high_score;
+		},
+
+		set_high_score : function (score) {
+			high_score = score;
 		}
 	}
 })();

@@ -1,12 +1,12 @@
-var background_animation = (function () {
+var Animator = (function () {
 
 	return {
-		startAnimations: function () {
+		start_animations: function () {
 		   $(".animated").css('animation-play-state', 'running');
 		   $(".animated").css('-webkit-animation-play-state', 'running');
 		},
 
-		endAnimations: function () {
+		end_animations: function () {
 		   $(".animated").css('animation-play-state', 'paused');
 		   $(".animated").css('-webkit-animation-play-state', 'paused');
 		}

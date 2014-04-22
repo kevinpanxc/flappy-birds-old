@@ -17,7 +17,6 @@ var pipes = new Array();
 var clients = {};
 
 io.sockets.on('connection', function (socket) {
-
 	socket.on('register-request', function (data) {
 		//clients = {};
 		//var clientId = addNewClient();

@@ -48,12 +48,11 @@ $(document).ready(function() {
 
    currentstate = states.WaitingForServer;
 
-   var url = 'http://192.168.101.31:3700'
+   var url = 'http://localhost:3700'
    socket = io.connect(url);
 
    socket.on('register-response', function(data) {
       bird = new Bird(0,180,0,data);
-      showSplash();
       bird.reset();
 
       currentstate = states.SplashScreen;
@@ -81,6 +80,10 @@ $(document).ready(function() {
    });
 
    background_animation.endAnimations();
+
+   showSplash();
+
+   socket.emit('register-request', null);
    
 });
 
@@ -111,10 +114,6 @@ function setCookie(cname,cvalue,exdays)
 }
 
 function showSplash() {
-   currentstate = states.SplashScreen;
-   
-   bird.reset();
-   
    Sounds.playSoundSwoosh();
    
    //clear out all the pipes if there are any
@@ -130,7 +129,6 @@ function startGame() {
    background_animation.startAnimations();
    currentstate = states.GameScreen;
 
-   socket.emit('register-request', null);
    socket.emit('sync-request', bird.playerId);
    
    //fade out the splash
@@ -318,6 +316,8 @@ $("#replay").click(function() {
       
       //start the game over!
       showSplash();
+      currentstate = states.SplashScreen;
+      bird.reset();
    });
 });
 

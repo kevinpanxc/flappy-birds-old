@@ -13,8 +13,6 @@ function Bird (velocity, position, rotation, playerId) {
 	this.rotation = rotation;
 	this.score = 0;
 
-
-
 	this.reset = function(){
 		this.addToFlyArea(0);
 
@@ -50,10 +48,9 @@ function Bird (velocity, position, rotation, playerId) {
 	this.scored = function (){
 	   this.score += 1;
 	   Sounds.playSoundScore();
-	   Score.setBigScore(this.score);
+	   Score.display_big_score(this.score);
 	}
 
-   
    	this.updateBird = function(){
 
    		var player = $("#"+this.playerId);
