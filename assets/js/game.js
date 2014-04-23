@@ -35,9 +35,10 @@ var Game = (function () {
     }
 
     var add_bird = function(data) {
-        var new_bird = new Bird(data.velocity, data.position, data.rotation, data.clientId);
-        new_bird.addToFlyArea(data.timediff);
-        bird_array[data.clientId] = new_bird;
+        console.log(data);
+        var new_bird = new Bird(data.velocity, data.position, data.rotation, data.id);
+        new_bird.addToFlyArea(data.time_diff);
+        bird_array[data.id] = new_bird;
     }
 
     var show_splash = function () {
@@ -250,7 +251,7 @@ var Game = (function () {
             });
 
             socket.on('bird-jumped', function(data) {
-                if (data !== bird.playerId) birdArray[data].jump();
+                if (data !== bird.playerId) bird_array[data].jump();
             });
 
             socket.on('sync-response', function(data) {
@@ -261,7 +262,7 @@ var Game = (function () {
             });
 
             socket.on('bird-death-response', function(data) {
-                if (data !== bird.playerId) birdArray[data].die();
+                if (data !== bird.playerId) bird_array[data].die();
             });
 
             Animator.end_animations();

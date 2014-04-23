@@ -40,9 +40,8 @@ function Bird (velocity, position, rotation, playerId) {
 	}
 
 	this.jump = function() {
-	   this.velocity = jump;
-
-	   Sounds.playSoundJump();
+		this.velocity = jump;
+		Sounds.playSoundJump();
 	}
 
 	this.scored = function (){
@@ -52,12 +51,11 @@ function Bird (velocity, position, rotation, playerId) {
 	}
 
    	this.updateBird = function(){
-
    		var player = $("#"+this.playerId);
 
 	   	this.velocity += gravity;
 	   	this.position += this.velocity;
-  
+
 	   	//rotation
 	   	this.rotation = Math.min((this.velocity / 10) * 90, 90);
 	   
