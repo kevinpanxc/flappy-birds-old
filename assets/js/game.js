@@ -93,6 +93,7 @@ var Game = (function () {
     var screen_click = function () {
         if (current_state == states.GAME_SCREEN) {
             socket.emit('bird-jump', bird.playerId);
+            socket.emit('state-update', { client_id : bird.playerId, state : "PLAYING" });
             bird.jump();
         } else if (current_state == states.SPLASH_SCREEN) {
             start_run();
@@ -104,7 +105,7 @@ var Game = (function () {
         current_state = states.GAME_SCREEN;
 
         socket.emit('sync-request', bird.playerId);
-        socket.emit('state-change', { client_id : bird.playerId, state : "PLAYING" });
+        socket.emit('state-update', { client_id : bird.playerId, state : "PLAYING" });
 
         fade_out_splash();
 
@@ -120,7 +121,7 @@ var Game = (function () {
 
     var end_run = function () {
         socket.emit('bird-death-request', bird.playerId);
-        socket.emit('state-change', { client_id : bird.playerId, state : "IDLE" });
+        socket.emit('state-update', { client_id : bird.playerId, state : "IDLE" });
         bird.die();
 
         Animator.end_animations();

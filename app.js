@@ -15,6 +15,9 @@ console.log("Listening on port " + port);
 var client_module = require("./client_module");
 var pipe_module = require("./pipe_module");
 
+// third party modules
+var moment = require('moment');
+
 // sockets event listening
 io.sockets.on('connection', function (socket) {
 	socket.on('register-request', function (data) {
@@ -27,6 +30,7 @@ io.sockets.on('connection', function (socket) {
 
     //asking for all the birds
     socket.on('sync-request', function(data) {
+        if (client_module.all[data] == undefined) client_module.add_new(data);
     	socket.emit('sync-response', client_module.generate_client_package(data));
     }); 
 
@@ -39,9 +43,15 @@ io.sockets.on('connection', function (socket) {
     	io.sockets.emit('bird-death-response', data);
     });
 
-    socket.on('state-change', function(data){
-        client_module.all[data.client_id].change_state(data.state);
+    socket.on('state-update', function(data){
+        client_module.all[data.client_id].update_state(data.state);
 
         console.log("STATE: " + client_module.all[data.client_id].state);
     });
+
+    socket.on('client-list-request', function() {
+        socket.emit('client-list-response', client_module.all);
+    });
 });
+
+var state_clean_up_service = setInterval(client_module.scan_states, 1000);
