@@ -31,11 +31,17 @@ io.sockets.on('connection', function (socket) {
     }); 
 
     //on bird jump, re-emit
-    socket.on('bird-jump',function(data){
+    socket.on('bird-jump', function(data){
     	io.sockets.emit('bird-jumped', data);
     });
 
-    socket.on('bird-death-request',function(data){
+    socket.on('bird-death-request', function(data){
     	io.sockets.emit('bird-death-response', data);
+    });
+
+    socket.on('state-change', function(data){
+        client_module.all[data.client_id].change_state(data.state);
+
+        console.log("STATE: " + client_module.all[data.client_id].state);
     });
 });

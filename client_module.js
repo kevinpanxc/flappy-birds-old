@@ -1,11 +1,18 @@
 var all = {};
 
+var states = Object.freeze({
+    IDLE: 0,
+    PLAYING: 0
+});
+
 function Client() {
     this.id = this.random_string(16, 'aA');
     this.velocity = 0;
     this.position = 90;
     this.rotation = 0;
     this.time = new Date().getTime();
+
+    this.state = states.IDLE;
 }
 
 Client.prototype.random_string = function (length, chars) {
@@ -17,6 +24,11 @@ Client.prototype.random_string = function (length, chars) {
     var result = '';
     for (var i = length; i > 0; --i) result += mask[Math.round(Math.random() * (mask.length - 1))];
     return result;
+}
+
+Client.prototype.change_state = function (state) {
+    if (state === "IDLE") this.state = states.IDLE;
+    else if (state === "PLAYING") this.state = states.PLAYING;
 }
 
 module.exports = {
