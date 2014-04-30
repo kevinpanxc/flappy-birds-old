@@ -1,0 +1,68 @@
+h1 {
+    color: black;
+    font-family: "Lato";
+    font-size: 48px;
+    margin-top: 30px;
+    margin: 36px 22px 16px 22px;
+}
+
+#client-title {
+    color: #444;
+    font-family: Helvetica;
+    padding: 8px;
+    font-size: 14px;
+    background-color: #eee;
+}
+
+#clientscreen ul {
+    font-family: "Lato";
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#clientscreen li {
+    height: 42px;
+    margin-bottom: 1px;
+    background-color: #f5f5f5;
+}
+
+.client-color {
+    display: inline-block;
+    width: 4%;
+    height: 42px;
+    background-color: #15CF00;
+}
+
+.client-text {
+    display: inline-block;
+    width: 90%;
+    height: 42px;
+    padding: 6px;
+    vertical-align: top;
+}
+
+.client-id {
+    color: #5a5a5a;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.client-status {
+    color: #777;
+    font-size: 12px;
+}
+
+.title-image {
+    display: inline-block;
+    width: 34px;
+    height: 24px;
+    margin: 0 5px;
+    background-image: url('../images/bird.png');
+}
+
+.client-count {
+    color: black;
+    font-family: "Open Sans";
+    margin-left: 22px;
+}

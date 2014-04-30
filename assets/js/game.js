@@ -1,3 +1,48 @@
+var Pipes = (function () {
+    var pipeIndex = 0;
+    var pipeheight = 90;
+    var pipewidth = 52;
+    var pipes = new Array();
+
+    return {
+        getAndIncrementPipeIndex: function () {
+            return pipeIndex++;
+        },
+
+        getPipeHeight: function () {
+            return pipeheight;
+        },
+
+        getPipeWidth: function () {
+            return pipewidth;
+        },
+
+        getPipe: function (index) {
+            return pipes[index];
+        },
+
+        pushPipe: function (pipe) {
+            pipes.push(pipe);
+        },
+
+        clearPipes: function () {
+            pipes = new Array();
+        },
+
+        removeUsedPipe: function () {
+            pipes.splice(0, 1);
+        },
+
+        setEasyMode: function() {
+            pipeheight = 200;
+        },
+
+        resetIndex: function (){
+            pipeIndex = 0;
+        }
+    }
+})();
+
 var Game = (function () {
     var states = Object.freeze({
         SPLASH_SCREEN: 0,
@@ -56,7 +101,7 @@ var Game = (function () {
 
     var remove_pipes = function () {
         $(".pipe").remove();
-        pipe_data_container.clearPipes();
+        Pipes.clearPipes();
     }
 
     var game_loop_function = function () {
@@ -134,7 +179,7 @@ var Game = (function () {
         clearInterval(loop_game);
         clearInterval(loop_pipe);
 
-        pipe_data_container.resetIndex();
+        Pipes.resetIndex();
 
         if (is_incompatible.any()) show_score();
         else {
@@ -202,7 +247,7 @@ var Game = (function () {
         //Do any pipes need removal?
         $(".pipe").filter(function() { return $(this).position().left <= -100; }).remove();
 
-        Network.send.new_pipe({ index: pipe_data_container.getAndIncrementPipeIndex() });
+        Network.send.new_pipe({ index: Pipes.getAndIncrementPipeIndex() });
     }
 
     var is_incompatible = {
@@ -231,7 +276,7 @@ var Game = (function () {
 
     return {
         initialize : function () {
-            if (window.location.search == "?easy") pipe_data_container.setEasyMode();
+            if (window.location.search == "?easy") Pipes.setEasyMode();
 
             var saved_score = get_cookie("high_score");
 
@@ -251,7 +296,7 @@ var Game = (function () {
             Network.on.pipe_returned(function(data) {
                 var newpipe = $('<div class="pipe animated"><div class="pipe_upper" style="height: ' + data.topheight + 'px;"></div><div class="pipe_lower" style="height: ' + data.bottomheight + 'px;"></div></div>');
                 $("#flyarea").append(newpipe);
-                pipe_data_container.pushPipe(newpipe);            
+                Pipes.pushPipe(newpipe);            
             });
 
             Network.on.bird_jumped(function(data) {
@@ -296,4 +341,6 @@ $(function () {
     Game.initialize();
 
     Game.setup_controls();
+
+    ExternalUI.initialize();
 });

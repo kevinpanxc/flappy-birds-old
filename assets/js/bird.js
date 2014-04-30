@@ -83,14 +83,14 @@ function Bird (velocity, position, rotation, playerId) {
    		if(this.noPipesYet()) {
    			return ALIVE;
    		} else {
-	   		var nextpipe = pipe_data_container.getPipe(0);
+	   		var nextpipe = Pipes.getPipe(0);
 
 	   		var pipeDimensions = this.getPipeDimensions(nextpipe);
 	   
 	   		if(this.didWeCollideWithPipe(boxDimensions, pipeDimensions)) return DEAD;
 	   
 		   	if(this.didWePassPipe(boxDimensions.boxleft, pipeDimensions)) {
-		      	pipe_data_container.removeUsedPipe();
+		      	Pipes.removeUsedPipe();
 		      
 		      	this.scored();
 		   	}
@@ -112,7 +112,7 @@ function Bird (velocity, position, rotation, playerId) {
 	}
 
 	this.noPipesYet = function () {
-		return pipe_data_container.getPipe(0) == null;
+		return Pipes.getPipe(0) == null;
 	}
 
 	this.getPipeDimensions = function (nextpipe) {
@@ -120,8 +120,8 @@ function Bird (velocity, position, rotation, playerId) {
 
 		var pipetop = nextpipeupper.offset().top + nextpipeupper.height();
 	   	var pipeleft = nextpipeupper.offset().left - 2; // for some reason it starts at the inner pipes offset, not the outer pipes.
-	   	var piperight = pipeleft + pipe_data_container.getPipeWidth();
-	   	var pipebottom = pipetop + pipe_data_container.getPipeHeight();
+	   	var piperight = pipeleft + Pipes.getPipeWidth();
+	   	var pipebottom = pipetop + Pipes.getPipeHeight();
 
 		return {
 			pipetop : pipetop,

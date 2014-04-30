@@ -64,7 +64,7 @@ module.exports = {
             if (client.state === states.IDLE) {
                 if (state_time_diff > 600000) delete all[client_id];
             } else if (client.state === states.PLAYING) {
-                if (state_time_diff > 10000) client.change_state("IDLE");
+                if (state_time_diff > 10000) client.update_state("IDLE");
             }
         }
     },

@@ -135,18 +135,36 @@ body
 #gamecontainer
 {
    position: relative;
-   width: 100%;
-   height: 525px;
+   margin: 0 auto;
+   width: 1000px;
+   height: 545px;
 }
 
-/*
-Screen - Game
-*/
+#pipe-blocker
+{
+   width: 100%;
+   height: 100%;
+   position: absolute;
+   background-color: white;
+}
+
 #gamescreen
 {
    position: absolute;
-   width: 100%;
+   left: 0;
+   width: 80%;
    height: 100%;
+}
+
+#clientscreen
+{
+   position: absolute;
+   right: 0;
+   width: 20%;
+   height: 100%;
+   background-color: #ddd;
+   z-index: 11;
+   overflow-y: scroll;
 }
 
 #sky
