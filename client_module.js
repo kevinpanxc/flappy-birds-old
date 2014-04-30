@@ -10,13 +10,13 @@ function Client(client_id) {
     else this.id = client_id;
 
     this.velocity = 0;
-    this.position = 90;
+    this.position = 180;
     this.rotation = 0;
-    this.time = new Date().getTime();
 
     this.state = states.IDLE;
 
     this.state_timestamp = new Date().getTime();
+    this.start_game_timestamp = null;
 }
 
 Client.prototype.random_string = function (length, chars) {
@@ -49,9 +49,10 @@ module.exports = {
     generate_client_package : function (from_client_id) {
         var client_package = {};
         for (client_id in all) {
-            if (from_client_id !== client_id) {
-                all[client_id].time_diff = all[client_id].time - all[from_client_id].time;
-                client_package[client_id] = all[client_id];
+            client = all[client_id];
+            if (from_client_id !== client_id && client.state === states.PLAYING) {
+                client.time_diff = all[from_client_id].start_game_timestamp - client.start_game_timestamp;
+                client_package[client_id] = client;
             }
         }
         return client_package;

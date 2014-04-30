@@ -1,19 +1,22 @@
 function Bird (velocity, position, rotation, playerId) {
-
-	var gravity = 0.25;
-	var jump = -4.6;
+	// var gravity = 0.25;
+	var gravity = 0;
+	// var jump = -4.6;
+	var jump = 0;
 
 	var DEAD = false;
 	var ALIVE = true;
-
 
 	this.playerId = playerId;
 	this.velocity = velocity;
 	this.position = position;
 	this.rotation = rotation;
 	this.score = 0;
+	this.is_dead = false;
 
 	this.reset = function(){
+		this.is_dead = false;
+
 		this.addToFlyArea(0);
 
 		//set the defaults (again)
@@ -27,7 +30,7 @@ function Bird (velocity, position, rotation, playerId) {
 	}
 	
 	this.addToFlyArea = function(timediff){		
-		var player = $("#"+this.playerId)
+		var player = $("#"+this.playerId);
 		if (player) player.remove();
 
 	   	var overallBirdDiv = document.getElementById("birds");
@@ -37,6 +40,11 @@ function Bird (velocity, position, rotation, playerId) {
 	   	overallBirdDiv.appendChild(newBird);
 
 	   	$(newBird).css({ x: 60 + timediff * 0.1333});		
+	}
+
+	this.remove = function () {
+		var player = $("#"+this.playerId);
+		if (player) player.remove();
 	}
 
 	this.jump = function() {
@@ -158,12 +166,12 @@ function Bird (velocity, position, rotation, playerId) {
 	}
 
 	this.die = function(){
+		this.is_dead = true;
 		//drop the bird to the floor
-	   var playerbottom = $("#"+this.playerId).position().top + $("#"+this.playerId).width(); //we use width because he'll be rotated 90 deg
-	   var floor = $("#flyarea").height();
-	   var movey = Math.max(0, floor - playerbottom);
+		var playerbottom = $("#"+this.playerId).position().top + $("#"+this.playerId).width(); //we use width because he'll be rotated 90 deg
+		var floor = $("#flyarea").height();
+		var movey = Math.max(0, floor - playerbottom);
 
-	   $("#"+this.playerId).transition({ y: movey + 'px', rotate: 90}, 1000, 'easeInOutCubic');
+		$("#"+this.playerId).transition({ y: movey + 'px', rotate: 90}, 1000, 'easeInOutCubic');
 	}
-
 }

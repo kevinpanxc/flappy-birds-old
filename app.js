@@ -30,9 +30,14 @@ io.sockets.on('connection', function (socket) {
 
     //asking for all the birds
     socket.on('sync-request', function(data) {
-        if (client_module.all[data] == undefined) client_module.add_new(data);
     	socket.emit('sync-response', client_module.generate_client_package(data));
     }); 
+
+    //game start to initialize game start timestamp for bird
+    socket.on('start-game', function(data) {
+        if (client_module.all[data] == undefined) client_module.add_new(data);
+        client_module.all[data].start_game_timestamp = new Date().getTime();
+    });
 
     //on bird jump, re-emit
     socket.on('bird-jump', function(data){
@@ -41,6 +46,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('bird-death-request', function(data){
     	io.sockets.emit('bird-death-response', data);
+        client_module.all[data].start_game_timestamp = null;
     });
 
     socket.on('state-update', function(data){

@@ -42,6 +42,7 @@ var Game = (function () {
     }
 
     var show_splash = function () {
+        remove_all_birds();
         Sounds.playSoundSwoosh();
         remove_pipes();
         fade_in_splash();
@@ -64,14 +65,18 @@ var Game = (function () {
     var game_loop_function = function () {
         bird.updateBird();
         update_all_birds();
-        if (!bird.checkAlive()) {
-            end_run();
-        }
+        if (!bird.checkAlive()) end_run();
     }
 
     var update_all_birds = function () {
+        for (var client_id in bird_array) {
+            if (!bird_array[client_id].is_dead) bird_array[client_id].updateBird();
+        }
+    }
+
+    var remove_all_birds = function () {
         for (var bird in bird_array) {
-            bird_array[bird].updateBird();
+            bird_array[bird].remove();
         }
     }
 
@@ -104,6 +109,7 @@ var Game = (function () {
         Animator.start_animations();
         current_state = states.GAME_SCREEN;
 
+        socket.emit('start-game', bird.playerId);
         socket.emit('sync-request', bird.playerId);
         socket.emit('state-update', { client_id : bird.playerId, state : "PLAYING" });
 
@@ -254,7 +260,7 @@ var Game = (function () {
             });
 
             socket.on('bird-jumped', function(data) {
-                if (data !== bird.playerId) bird_array[data].jump();
+                if (data !== bird.playerId && current_state == states.GAME_SCREEN) bird_array[data].jump();
             });
 
             socket.on('sync-response', function(data) {
@@ -265,7 +271,7 @@ var Game = (function () {
             });
 
             socket.on('bird-death-response', function(data) {
-                if (data !== bird.playerId) bird_array[data].die();
+                if (data !== bird.playerId && current_state == states.GAME_SCREEN) bird_array[data].die();
             });
 
             Animator.end_animations();
