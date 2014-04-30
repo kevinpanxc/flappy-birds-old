@@ -14,9 +14,6 @@ var Game = (function () {
     var loop_game;
     var loop_pipe;
 
-    var socket;
-    var url = 'http://localhost:3700';
-
     var get_cookie = function (c_name) {
         var name = c_name + "=";
         var ca = document.cookie.split(';');
@@ -97,8 +94,8 @@ var Game = (function () {
 
     var screen_click = function () {
         if (current_state == states.GAME_SCREEN) {
-            socket.emit('bird-jump', bird.playerId);
-            socket.emit('state-update', { client_id : bird.playerId, state : "PLAYING" });
+            Network.send.jump(bird.playerId);
+            Network.send.update_state({ client_id : bird.playerId, state : "PLAYING" });
             bird.jump();
         } else if (current_state == states.SPLASH_SCREEN) {
             start_run();
@@ -109,9 +106,9 @@ var Game = (function () {
         Animator.start_animations();
         current_state = states.GAME_SCREEN;
 
-        socket.emit('start-game', bird.playerId);
-        socket.emit('sync-request', bird.playerId);
-        socket.emit('state-update', { client_id : bird.playerId, state : "PLAYING" });
+        Network.send.start_game(bird.playerId);
+        Network.send.sync(bird.playerId);
+        Network.send.update_state({ client_id : bird.playerId, state : "PLAYING" });
 
         fade_out_splash();
 
@@ -126,8 +123,8 @@ var Game = (function () {
     }
 
     var end_run = function () {
-        socket.emit('bird-death-request', bird.playerId);
-        socket.emit('state-update', { client_id : bird.playerId, state : "IDLE" });
+        Network.send.death(bird.playerId);
+        Network.send.update_state({ client_id : bird.playerId, state : "IDLE" })
         bird.die();
 
         Animator.end_animations();
@@ -205,9 +202,7 @@ var Game = (function () {
         //Do any pipes need removal?
         $(".pipe").filter(function() { return $(this).position().left <= -100; }).remove();
 
-        socket.emit('pipe-request', {
-          index: pipe_data_container.getAndIncrementPipeIndex()
-        });
+        Network.send.new_pipe({ index: pipe_data_container.getAndIncrementPipeIndex() });
     }
 
     var is_incompatible = {
@@ -244,33 +239,33 @@ var Game = (function () {
 
             current_state = states.WAITING_FOR_SERVER;
 
-            socket = io.connect(url);
+            Network.initialize();
 
-            socket.on('register-response', function(data) {
-                bird = new Bird(0, 180, 0, data);
-                bird.reset();
+            Network.on.register_success(function(data) {
+                    bird = new Bird(0, 180, 0, data);
+                    bird.reset();
 
-                current_state = states.SPLASH_SCREEN;
+                    current_state = states.SPLASH_SCREEN;
             });
 
-            socket.on('pipe-response', function(data) {
+            Network.on.pipe_returned(function(data) {
                 var newpipe = $('<div class="pipe animated"><div class="pipe_upper" style="height: ' + data.topheight + 'px;"></div><div class="pipe_lower" style="height: ' + data.bottomheight + 'px;"></div></div>');
                 $("#flyarea").append(newpipe);
                 pipe_data_container.pushPipe(newpipe);            
             });
 
-            socket.on('bird-jumped', function(data) {
+            Network.on.bird_jumped(function(data) {
                 if (data !== bird.playerId && current_state == states.GAME_SCREEN) bird_array[data].jump();
             });
 
-            socket.on('sync-response', function(data) {
+            Network.on.sync_success(function(data) {
                 bird_array = {};
                 for (client in data) {
                     add_bird(data[client]);
                 }
             });
 
-            socket.on('bird-death-response', function(data) {
+            Network.on.bird_death(function(data) {
                 if (data !== bird.playerId && current_state == states.GAME_SCREEN) bird_array[data].die();
             });
 
@@ -278,7 +273,7 @@ var Game = (function () {
 
             show_splash();
 
-            socket.emit('register-request', null);            
+            Network.send.register(null);          
         },
 
         setup_controls : function () {
