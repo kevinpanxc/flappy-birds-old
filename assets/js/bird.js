@@ -1,13 +1,13 @@
-function Bird (velocity, position, rotation, playerId) {
-	// var gravity = 0.25;
-	var gravity = 0;
-	// var jump = -4.6;
-	var jump = 0;
+function Bird (velocity, position, rotation, player_id) {
+	var gravity = 0.25;
+	// var gravity = 0;
+	var jump = -4.6;
+	// var jump = 0;
 
 	var DEAD = false;
 	var ALIVE = true;
 
-	this.playerId = playerId;
+	this.player_id = player_id;
 	this.velocity = velocity;
 	this.position = position;
 	this.rotation = rotation;
@@ -17,7 +17,7 @@ function Bird (velocity, position, rotation, playerId) {
 	this.reset = function(){
 		this.is_dead = false;
 
-		this.addToFlyArea(0);
+		this.add_to_fly_area(0);
 
 		//set the defaults (again)
 		this.velocity = 0;
@@ -26,24 +26,24 @@ function Bird (velocity, position, rotation, playerId) {
 		this.score = 0;
 
 		//update the player in preparation for the next game
-		this.updateBird();
+		this.update_bird();
 	}
 	
-	this.addToFlyArea = function(timediff){		
-		var player = $("#"+this.playerId);
+	this.add_to_fly_area = function(time_diff){		
+		var player = $("#"+this.player_id);
 		if (player) player.remove();
 
-	   	var overallBirdDiv = document.getElementById("birds");
-	   	var newBird = document.createElement("div");
-	   	newBird.className = "bird animated";
-	   	newBird.id = this.playerId;
-	   	overallBirdDiv.appendChild(newBird);
+	   	var birds_container = document.getElementById("birds");
+	   	var new_bird = document.createElement("div");
+	   	new_bird.className = "bird animated";
+	   	new_bird.id = this.player_id;
+	   	birds_container.appendChild(new_bird);
 
-	   	$(newBird).css({ x: 60 + timediff * 0.1333});		
+	   	$(new_bird).css({ x: 60 + time_diff * 0.1333});		
 	}
 
 	this.remove = function () {
-		var player = $("#"+this.playerId);
+		var player = $("#"+this.player_id);
 		if (player) player.remove();
 	}
 
@@ -58,8 +58,8 @@ function Bird (velocity, position, rotation, playerId) {
 	   Score.display_big_score(this.score);
 	}
 
-   	this.updateBird = function(){
-   		var player = $("#"+this.playerId);
+   	this.update_bird = function(){
+   		var player = $("#"+this.player_id);
 
 	   	this.velocity += gravity;
 	   	this.position += this.velocity;
@@ -71,26 +71,26 @@ function Bird (velocity, position, rotation, playerId) {
 	   	$(player).css({ rotate: this.rotation, top: this.position });
 	}
 
-	this.checkAlive = function(){
-	 	var box = document.getElementById(this.playerId).getBoundingClientRect();
+	this.check_alive = function(){
+	 	var box = document.getElementById(this.player_id).getBoundingClientRect();
 		
-		var boxDimensions = this.getBoxDimensions(box);
+		var box_dimensions = this.get_box_dimensions(box);
 	  
-	   	if(this.touchGround(box)) return DEAD;
+	   	if(this.touch_ground(box)) return DEAD;
 	   
-	   	if(this.touchCeiling(boxDimensions.boxtop)) this.doNotAllowBirdToFlyHigher();
+	   	if(this.touch_ceiling(box_dimensions.box_top)) this.do_not_allow_bird_to_fly_higher();
 
-   		if(this.noPipesYet()) {
+   		if(this.no_pipes_yet()) {
    			return ALIVE;
    		} else {
-	   		var nextpipe = Pipes.getPipe(0);
+	   		var next_pipe = Pipes.get_pipe(0);
 
-	   		var pipeDimensions = this.getPipeDimensions(nextpipe);
+	   		var pipe_dimensions = this.get_pipe_dimensions(next_pipe);
 	   
-	   		if(this.didWeCollideWithPipe(boxDimensions, pipeDimensions)) return DEAD;
+	   		if(this.did_we_collide_with_pipe(box_dimensions, pipe_dimensions)) return DEAD;
 	   
-		   	if(this.didWePassPipe(boxDimensions.boxleft, pipeDimensions)) {
-		      	Pipes.removeUsedPipe();
+		   	if(this.did_we_pass_pipe(box_dimensions.box_left, pipe_dimensions)) {
+		      	Pipes.remove_used_pipe();
 		      
 		      	this.scored();
 		   	}
@@ -98,80 +98,80 @@ function Bird (velocity, position, rotation, playerId) {
    		}
 	}
 
-	this.touchGround = function (box) {
+	this.touch_ground = function (box) {
 		return box.bottom >= $("#land").offset().top;
 	}
 
-	this.touchCeiling = function (boxtop) {
+	this.touch_ceiling = function (box_top) {
 		var ceiling = $("#ceiling");
-		return boxtop <= (ceiling.offset().top + ceiling.height());
+		return box_top <= (ceiling.offset().top + ceiling.height());
 	}
 
-	this.doNotAllowBirdToFlyHigher = function () {
+	this.do_not_allow_bird_to_fly_higher = function () {
 		this.position = 0;
 	}
 
-	this.noPipesYet = function () {
-		return Pipes.getPipe(0) == null;
+	this.no_pipes_yet = function () {
+		return Pipes.get_pipe(0) == null;
 	}
 
-	this.getPipeDimensions = function (nextpipe) {
-		var nextpipeupper = nextpipe.children(".pipe_upper");
+	this.get_pipe_dimensions = function (next_pipe) {
+		var next_upper_pipe = next_pipe.children(".pipe_upper");
 
-		var pipetop = nextpipeupper.offset().top + nextpipeupper.height();
-	   	var pipeleft = nextpipeupper.offset().left - 2; // for some reason it starts at the inner pipes offset, not the outer pipes.
-	   	var piperight = pipeleft + Pipes.getPipeWidth();
-	   	var pipebottom = pipetop + Pipes.getPipeHeight();
+		var pipe_top = next_upper_pipe.offset().top + next_upper_pipe.height();
+	   	var pipe_left = next_upper_pipe.offset().left - 2; // for some reason it starts at the inner pipes offset, not the outer pipes.
+	   	var pipe_right = pipe_left + Pipes.get_pipe_width();
+	   	var pipe_bottom = pipe_top + Pipes.get_pipe_height();
 
 		return {
-			pipetop : pipetop,
-			pipeleft : pipeleft,
-			piperight : piperight,
-			pipebottom : pipebottom
+			pipe_top : pipe_top,
+			pipe_left : pipe_left,
+			pipe_right : pipe_right,
+			pipe_bottom : pipe_bottom
 		}
 	}
 
-	this.getBoxDimensions = function (box) {
+	this.get_box_dimensions = function (box) {
 
-		var origwidth = 34.0;
-	 	var origheight = 24.0;
+		var orig_width = 34.0;
+	 	var orig_height = 24.0;
 
-		var boxwidth = origwidth - (Math.sin(Math.abs(this.rotation) / 90) * 8);
-		var boxheight = (origheight + box.height) / 2;
-		var boxleft = ((box.width - boxwidth) / 2) + box.left;
-		var boxtop = ((box.height - boxheight) / 2) + box.top;
-		var boxright = boxleft + boxwidth;
-		var boxbottom = boxtop + boxheight;
+		var box_width = orig_width - (Math.sin(Math.abs(this.rotation) / 90) * 8);
+		var box_height = (orig_height + box.height) / 2;
+		var box_left = ((box.width - box_width) / 2) + box.left;
+		var box_top = ((box.height - box_height) / 2) + box.top;
+		var box_right = box_left + box_width;
+		var box_bottom = box_top + box_height;
 
 		return {
-			boxwidth: boxwidth,
-			boxheight: boxheight,
-			boxleft: boxleft,
-			boxtop: boxtop,
-			boxright: boxright,
-			boxbottom: boxbottom
+			box_width: box_width,
+			box_height: box_height,
+			box_left: box_left,
+			box_top: box_top,
+			box_right: box_right,
+			box_bottom: box_bottom
 		}
 	}
 
-	this.didWeCollideWithPipe = function (boxDimensions, pipeDimensions) {
-		if (boxDimensions.boxright > pipeDimensions.pipeleft) {
-			if (!(boxDimensions.boxtop > pipeDimensions.pipetop && boxDimensions.boxbottom < pipeDimensions.pipebottom)) {
+	this.did_we_collide_with_pipe = function (box_dimensions, pipe_dimensions) {
+		if (box_dimensions.box_right > pipe_dimensions.pipe_left) {
+			if (!(box_dimensions.box_top > pipe_dimensions.pipe_top && box_dimensions.box_bottom < pipe_dimensions.pipe_bottom)) {
 				return true;
 			}
 		}
 	}
 
-	this.didWePassPipe = function (boxleft, pipeDimensions) {
-		return boxleft > pipeDimensions.piperight;
+	this.did_we_pass_pipe = function (box_left, pipe_dimensions) {
+		return box_left > pipe_dimensions.pipe_right;
 	}
 
 	this.die = function(){
 		this.is_dead = true;
 		//drop the bird to the floor
-		var playerbottom = $("#"+this.playerId).position().top + $("#"+this.playerId).width(); //we use width because he'll be rotated 90 deg
+		var player_bottom = $("#"+this.player_id).position().top + $("#"+this.player_id).width(); //we use width because he'll be rotated 90 deg
 		var floor = $("#flyarea").height();
-		var movey = Math.max(0, floor - playerbottom);
+		var movey = Math.max(0, floor - player_bottom);
 
-		$("#"+this.playerId).transition({ y: movey + 'px', rotate: 90}, 1000, 'easeInOutCubic');
+		$("#"+this.player_id).transition({ y: movey + 'px', rotate: 90}, 1000, 'easeInOutCubic');
 	}
 }

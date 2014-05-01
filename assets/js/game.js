@@ -1,44 +1,44 @@
 var Pipes = (function () {
-    var pipeIndex = 0;
-    var pipeheight = 90;
-    var pipewidth = 52;
-    var pipes = new Array();
+    var pipe_index = 0;
+    var pipe_height = 90;
+    var pipe_width = 52;
+    var all = new Array();
 
     return {
-        getAndIncrementPipeIndex: function () {
-            return pipeIndex++;
+        get_pipe_and_increment_pipe_index: function () {
+            return pipe_index++;
         },
 
-        getPipeHeight: function () {
-            return pipeheight;
+        get_pipe_height: function () {
+            return pipe_height;
         },
 
-        getPipeWidth: function () {
-            return pipewidth;
+        get_pipe_width: function () {
+            return pipe_width;
         },
 
-        getPipe: function (index) {
-            return pipes[index];
+        get_pipe: function (index) {
+            return all[index];
         },
 
-        pushPipe: function (pipe) {
-            pipes.push(pipe);
+        push_pipe: function (pipe) {
+            all.push(pipe);
         },
 
-        clearPipes: function () {
-            pipes = new Array();
+        clear_pipes: function () {
+            all = new Array();
         },
 
-        removeUsedPipe: function () {
-            pipes.splice(0, 1);
+        remove_used_pipe: function () {
+            all.splice(0, 1);
         },
 
-        setEasyMode: function() {
-            pipeheight = 200;
+        set_easy_mode: function() {
+            pipe_height = 200;
         },
 
-        resetIndex: function (){
-            pipeIndex = 0;
+        reset_index: function (){
+            pipe_index = 0;
         }
     }
 })();
@@ -79,7 +79,7 @@ var Game = (function () {
     var add_bird = function(data) {
         console.log(data);
         var new_bird = new Bird(data.velocity, data.position, data.rotation, data.id);
-        new_bird.addToFlyArea(data.time_diff);
+        new_bird.add_to_fly_area(data.time_diff);
         bird_array[data.id] = new_bird;
     }
 
@@ -101,18 +101,18 @@ var Game = (function () {
 
     var remove_pipes = function () {
         $(".pipe").remove();
-        Pipes.clearPipes();
+        Pipes.clear_pipes();
     }
 
     var game_loop_function = function () {
-        bird.updateBird();
+        bird.update_bird();
         update_all_birds();
-        if (!bird.checkAlive()) end_run();
+        if (!bird.check_alive()) end_run();
     }
 
     var update_all_birds = function () {
         for (var client_id in bird_array) {
-            if (!bird_array[client_id].is_dead) bird_array[client_id].updateBird();
+            if (!bird_array[client_id].is_dead) bird_array[client_id].update_bird();
         }
     }
 
@@ -139,8 +139,8 @@ var Game = (function () {
 
     var screen_click = function () {
         if (current_state == states.GAME_SCREEN) {
-            Network.send.jump(bird.playerId);
-            Network.send.update_state({ client_id : bird.playerId, state : "PLAYING" });
+            Network.send.jump(bird.player_id);
+            Network.send.update_state({ client_id : bird.player_id, state : "PLAYING" });
             bird.jump();
         } else if (current_state == states.SPLASH_SCREEN) {
             start_run();
@@ -151,9 +151,9 @@ var Game = (function () {
         Animator.start_animations();
         current_state = states.GAME_SCREEN;
 
-        Network.send.start_game(bird.playerId);
-        Network.send.sync(bird.playerId);
-        Network.send.update_state({ client_id : bird.playerId, state : "PLAYING" });
+        Network.send.start_game(bird.player_id);
+        Network.send.sync(bird.player_id);
+        Network.send.update_state({ client_id : bird.player_id, state : "PLAYING" });
 
         fade_out_splash();
 
@@ -168,8 +168,8 @@ var Game = (function () {
     }
 
     var end_run = function () {
-        Network.send.death(bird.playerId);
-        Network.send.update_state({ client_id : bird.playerId, state : "IDLE" })
+        Network.send.death(bird.player_id);
+        Network.send.update_state({ client_id : bird.player_id, state : "IDLE" })
         bird.die();
 
         Animator.end_animations();
@@ -179,7 +179,7 @@ var Game = (function () {
         clearInterval(loop_game);
         clearInterval(loop_pipe);
 
-        Pipes.resetIndex();
+        Pipes.reset_index();
 
         if (is_incompatible.any()) show_score();
         else {
@@ -247,7 +247,7 @@ var Game = (function () {
         //Do any pipes need removal?
         $(".pipe").filter(function() { return $(this).position().left <= -100; }).remove();
 
-        Network.send.new_pipe({ index: Pipes.getAndIncrementPipeIndex() });
+        Network.send.new_pipe({ index: Pipes.get_pipe_and_increment_pipe_index() });
     }
 
     var is_incompatible = {
@@ -276,7 +276,7 @@ var Game = (function () {
 
     return {
         initialize : function () {
-            if (window.location.search == "?easy") Pipes.setEasyMode();
+            if (window.location.search == "?easy") Pipes.set_easy_mode();
 
             var saved_score = get_cookie("high_score");
 
@@ -294,13 +294,13 @@ var Game = (function () {
             });
 
             Network.on.pipe_returned(function(data) {
-                var newpipe = $('<div class="pipe animated"><div class="pipe_upper" style="height: ' + data.topheight + 'px;"></div><div class="pipe_lower" style="height: ' + data.bottomheight + 'px;"></div></div>');
-                $("#flyarea").append(newpipe);
-                Pipes.pushPipe(newpipe);            
+                var new_pipe = $('<div class="pipe animated"><div class="pipe_upper" style="height: ' + data.topheight + 'px;"></div><div class="pipe_lower" style="height: ' + data.bottomheight + 'px;"></div></div>');
+                $("#flyarea").append(new_pipe);
+                Pipes.push_pipe(new_pipe);            
             });
 
             Network.on.bird_jumped(function(data) {
-                if (data !== bird.playerId && current_state == states.GAME_SCREEN) bird_array[data].jump();
+                if (data !== bird.player_id && current_state == states.GAME_SCREEN) bird_array[data].jump();
             });
 
             Network.on.sync_success(function(data) {
@@ -311,7 +311,7 @@ var Game = (function () {
             });
 
             Network.on.bird_death(function(data) {
-                if (data !== bird.playerId && current_state == states.GAME_SCREEN) bird_array[data].die();
+                if (data !== bird.player_id && current_state == states.GAME_SCREEN) bird_array[data].die();
             });
 
             Animator.end_animations();
