@@ -58,6 +58,7 @@ var Game = (function () {
 
     var loop_game;
     var loop_pipe;
+    var loop_check_connection;
 
     var get_cookie = function (c_name) {
         var name = c_name + "=";
@@ -85,7 +86,7 @@ var Game = (function () {
 
     var show_splash = function () {
         remove_all_birds();
-        Sounds.playSoundSwoosh();
+        Sounds.play_swoosh();
         remove_pipes();
         fade_in_splash();
     }
@@ -183,8 +184,8 @@ var Game = (function () {
 
         if (is_incompatible.any()) show_score();
         else {
-            Sounds.playSoundHit().bindOnce("ended", function() {
-                Sounds.playSoundDie().bindOnce("ended", function() {
+            Sounds.play_hit().bindOnce("ended", function() {
+                Sounds.play_die().bindOnce("ended", function() {
                     show_score();
                 });
             });
@@ -207,13 +208,13 @@ var Game = (function () {
 
         var medal = set_medal();
 
-        Sounds.playSoundSwoosh();
+        Sounds.play_swoosh();
 
         $("#scoreboard").css({ y: '40px', opacity: 0 }); //move it down so we can slide it up
         $("#replay").css({ y: '40px', opacity: 0 });
         $("#scoreboard").transition({ y: '0px', opacity: 1}, 600, 'ease', function() {
         //When the animation is done, animate in the replay button and SWOOSH!
-            Sounds.playSoundSwoosh();
+            Sounds.play_swoosh();
 
             $("#replay").transition({ y: '0px', opacity: 1}, 600, 'ease');
             //also animate in the MEDAL! WOO!
@@ -230,7 +231,7 @@ var Game = (function () {
         if (!replay_clickable) return;
         else replay_clickable = false;
 
-        Sounds.playSoundSwoosh();
+        Sounds.play_swoosh();
 
         $("#scoreboard").transition({ y: '-40px', opacity: 0}, 1000, 'ease', function() {
             //when that's done, display us back to nothing
@@ -287,10 +288,14 @@ var Game = (function () {
             Network.initialize();
 
             Network.on.register_success(function(data) {
-                    bird = new Bird(0, 180, 0, data);
-                    bird.reset();
+                bird = new Bird(0, 180, 0, data);
+                bird.reset();
 
-                    current_state = states.SPLASH_SCREEN;
+                loop_check_connection = setInterval(function () {
+                    Network.send.update_state({ client_id : bird.player_id });
+                }, 5000);
+
+                current_state = states.SPLASH_SCREEN;
             });
 
             Network.on.pipe_returned(function(data) {
@@ -318,12 +323,12 @@ var Game = (function () {
 
             show_splash();
 
-            Network.send.register(null);          
+            Network.send.register(null);
         },
 
         setup_controls : function () {
             $(document).keydown(function(e) {
-                if(e.keyCode == 32) {
+                if(e.keyCode == 32) { // space bar
                     if (current_state == states.SCORE_SCREEN) replay();
                     else screen_click();
                 }
@@ -331,8 +336,8 @@ var Game = (function () {
 
             $("#replay").click(replay);
 
-            if ("ontouchstart" in window) $(document).on("touchstart", screen_click);
-            else $(document).on("mousedown", screen_click);
+            if ("ontouchstart" in window) $("#gamescreen").on("touchstart", screen_click);
+            else $("#gamescreen").on("mousedown", screen_click);
         }
     }
 })();

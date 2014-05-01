@@ -50,7 +50,8 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('state-update', function(data){
-        client_module.all[data.client_id].update_state(data.state);
+        if (typeof data.state !== "undefined") client_module.all[data.client_id].update_state(data.state);
+        else client_module.all[data.client_id].update_state();
 
         console.log("STATE: " + client_module.all[data.client_id].state);
     });

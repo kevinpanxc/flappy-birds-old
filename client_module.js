@@ -62,7 +62,7 @@ module.exports = {
             client = all[client_id];
             state_time_diff = new Date().getTime() - client.state_timestamp;
             if (client.state === states.IDLE) {
-                if (state_time_diff > 600000) delete all[client_id];
+                if (state_time_diff > 12000) delete all[client_id];
             } else if (client.state === states.PLAYING) {
                 if (state_time_diff > 10000) client.update_state("IDLE");
             }
