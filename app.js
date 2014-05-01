@@ -21,7 +21,8 @@ var moment = require('moment');
 // sockets event listening
 io.sockets.on('connection', function (socket) {
 	socket.on('register-request', function (data) {
-		socket.emit('register-response', client_module.add_new());
+        return_package = { client_id : client_module.add_new(), clients : client_module.all }
+		socket.emit('register-response', return_package);
 	});
 
     socket.on('pipe-request', function (data) {
@@ -50,6 +51,8 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('state-update', function(data){
+        if (client_module.all[data.client_id] == undefined) client_module.add_new(data.client_id);
+
         if (typeof data.state !== "undefined") client_module.all[data.client_id].update_state(data.state);
         else client_module.all[data.client_id].update_state();
 

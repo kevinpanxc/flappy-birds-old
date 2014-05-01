@@ -285,17 +285,21 @@ var Game = (function () {
 
             current_state = states.WAITING_FOR_SERVER;
 
-            Network.initialize();
-
             Network.on.register_success(function(data) {
-                bird = new Bird(0, 180, 0, data);
+                bird = new Bird(0, 180, 0, data.client_id);
                 bird.reset();
+
+                ExternalUI.update_connected_clients_count(Object.keys(data.clients).length);
+
+                ExternalUI.update_connected_clients_list(data.clients);
 
                 loop_check_connection = setInterval(function () {
                     Network.send.update_state({ client_id : bird.player_id });
                 }, 5000);
 
                 current_state = states.SPLASH_SCREEN;
+
+                ExternalUI.remove_loading_blocker();
             });
 
             Network.on.pipe_returned(function(data) {
@@ -347,6 +351,8 @@ var Game = (function () {
 })();
 
 $(function () {
+    Network.initialize();
+
     Game.initialize();
 
     Game.setup_controls();

@@ -4,7 +4,8 @@ var ExternalUI = (function () {
 
     var loop_client_list;
     var cloneable_node;
-    var client_list;
+    var $client_list;
+    var $client_count;
 
     var initialize_cloneable_node = function () {
         var parent = document.createElement("li");
@@ -29,38 +30,60 @@ var ExternalUI = (function () {
         return parent;
     }
 
+    var update_connected_clients_list = function (clients) {
+        var clients_array = $.map(clients, function (value, key) { return value });
+
+        clients_array.sort(function (a,b) { return b.state - a.state });
+
+        $client_list.empty();
+
+        for (var i = 0; i < clients_array.length; i++) {
+            var client = clients_array[i];
+            var client_node_jquery = $(cloneable_node.cloneNode(true));
+
+            if (client.state === 0) {
+                client_node_jquery.find(".client-color").css( "background-color", IDLE_COLOR );
+                client_node_jquery.find(".client-status").html("Idle");
+            } else {
+                client_node_jquery.find(".client-color").css( "background-color", PLAYING_COLOR );
+                client_node_jquery.find(".client-status").html("Playing");
+            }
+
+            client_node_jquery.find(".client-id").html(client.id);
+
+            $client_list.append(client_node_jquery);
+        }
+    }
+
+    var update_connected_clients_count = function (count) {
+        $client_count.html(count);
+    }
+
     return {
         initialize : function () {
-            client_list = $("#clientscreen ul");
+            $client_list = $("#clientscreen ul");
+
+            $client_count = $("#client-count span");
 
             cloneable_node = initialize_cloneable_node();
 
             Network.on.client_list_returned(function (data) {
-                $(".client-count span").html(Object.keys(data).length);
+                update_connected_clients_count(Object.keys(data).length);
 
-                client_list.empty();
-
-                for (var client_id in data) {
-                    var client = data[client_id];
-                    var client_node_jquery = $(cloneable_node.cloneNode(true));
-
-                    if (client.state === 0) {
-                        client_node_jquery.find(".client-color").css( "background-color", IDLE_COLOR );
-                        client_node_jquery.find(".client-status").html("Idle");
-                    } else {
-                        client_node_jquery.find(".client-color").css( "background-color", PLAYING_COLOR );
-                        client_node_jquery.find(".client-status").html("Playing");
-                    }
-
-                    client_node_jquery.find(".client-id").html(client.id);
-
-                    client_list.append(client_node_jquery);
-                }
+                update_connected_clients_list(data);
             });
 
             loop_client_list = setInterval(function () {
                 Network.send.client_list(null);
             }, 3000);
-        }
+        },
+
+        remove_loading_blocker : function () {
+            $(".loading").remove();
+        },
+
+        update_connected_clients_count : update_connected_clients_count,
+
+        update_connected_clients_list : update_connected_clients_list
     }
 })();

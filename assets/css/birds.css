@@ -61,7 +61,7 @@ h1 {
     background-image: url('../images/bird.png');
 }
 
-.client-count {
+#client-count {
     color: black;
     font-family: "Open Sans";
     margin-left: 22px;

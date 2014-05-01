@@ -18,65 +18,93 @@ var Network = (function () {
     var RESPONSE_DEATH = 'bird-death-response';
     var RESPONSE_CLIENT_LIST = 'client-list-response';
 
+    var jump = function (data) {
+        socket.emit(REQUEST_JUMP, data);
+    }
+
+    var update_state = function (data) {
+        socket.emit(REQUEST_UPDATE_STATE, data);
+    }
+
+    var start_game = function (data) {
+        socket.emit(REQUEST_START_GAME, data);
+    }
+    
+    var death = function (data) {
+        socket.emit(REQUEST_DEATH, data);
+    }
+    
+    var new_pipe = function (data) {
+        socket.emit(REQUEST_NEW_PIPE, data);
+    }
+    
+    var register = function (data) {
+        socket.emit(REQUEST_REGISTER, data);
+    }
+
+    var sync = function (data) {
+        socket.emit(REQUEST_SYNC, data);
+    }
+
+    var client_list = function (data) {
+        socket.emit(REQUEST_CLIENT_LIST, data);
+    }
+
+    var register_success = function (callback) {
+        socket.on(RESPONSE_REGISTER, callback);
+    }
+
+    var pipe_returned = function (callback) {
+        socket.on(RESPONSE_NEW_PIPE, callback);
+    }
+
+    var bird_jumped = function (callback) {
+        socket.on(RESPONSE_JUMP, callback);
+    }
+
+    var sync_success = function (callback) {
+        socket.on(RESPONSE_SYNC, callback);
+    }
+
+    var bird_death = function (callback) {
+        socket.on(RESPONSE_DEATH, callback);
+    }
+
+    var client_list_returned = function (callback) {
+        socket.on(RESPONSE_CLIENT_LIST, callback);
+    }
+
     return {
         send : {
-            jump : function (data) {
-                socket.emit(REQUEST_JUMP, data);
-            },
+            jump : jump,
             
-            update_state : function (data) {
-                socket.emit(REQUEST_UPDATE_STATE, data);
-            },
+            update_state : update_state,
             
-            start_game : function (data) {
-                socket.emit(REQUEST_START_GAME, data);
-            },
+            start_game : start_game,
             
-            death : function (data) {
-                socket.emit(REQUEST_DEATH, data);
-            },
+            death : death,
             
-            new_pipe : function (data) {
-                socket.emit(REQUEST_NEW_PIPE, data);
-            },
+            new_pipe : new_pipe,
             
-            register : function (data) {
-                socket.emit(REQUEST_REGISTER, data);
-            },
+            register : register,
 
-            sync : function (data) {
-                socket.emit(REQUEST_SYNC, data);
-            },
+            sync : sync,
 
-            client_list : function (data) {
-                socket.emit(REQUEST_CLIENT_LIST, data);
-            }
+            client_list : client_list
         },
 
         on : {
-            register_success : function (callback) {
-                socket.on(RESPONSE_REGISTER, callback);
-            },
+            register_success : register_success,
 
-            pipe_returned : function (callback) {
-                socket.on(RESPONSE_NEW_PIPE, callback);
-            },
+            pipe_returned : pipe_returned,
 
-            bird_jumped : function (callback) {
-                socket.on(RESPONSE_JUMP, callback);
-            },
+            bird_jumped : bird_jumped,
 
-            sync_success : function (callback) {
-                socket.on(RESPONSE_SYNC, callback);
-            },
+            sync_success : sync_success,
 
-            bird_death : function (callback) {
-                socket.on(RESPONSE_DEATH, callback);
-            },
+            bird_death : bird_death,
 
-            client_list_returned : function (callback) {
-                socket.on(RESPONSE_CLIENT_LIST, callback);
-            }
+            client_list_returned : client_list_returned
         },
 
         initialize : function () {
