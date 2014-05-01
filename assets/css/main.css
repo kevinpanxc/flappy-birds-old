@@ -142,10 +142,12 @@ body
 
 #pipe-blocker
 {
-   width: 100%;
-   height: 100%;
    position: absolute;
+   width: 110px;
+   height: 100%;
+   left: -110px;
    background-color: white;
+   z-index: 11;
 }
 
 #gamescreen
@@ -327,6 +329,7 @@ body
    width: 34px;
    height: 24px;
    background-image: url('../images/bird.png');
+   z-index: 11;
    
    -webkit-animation: animBird 300ms steps(4) infinite;
    animation: animBird 300ms steps(4) infinite;

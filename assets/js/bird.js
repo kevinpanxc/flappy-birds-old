@@ -1,8 +1,9 @@
 function Bird (velocity, position, rotation, player_id) {
-	// var gravity = 0.25;
 	var gravity = 0;
-	// var jump = -4.6;
 	var jump = 0;
+
+	// var gravity = 0.25;
+	// var jump = -4.6;
 
 	var DEAD = false;
 	var ALIVE = true;
