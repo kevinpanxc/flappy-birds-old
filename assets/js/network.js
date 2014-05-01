@@ -1,6 +1,6 @@
 var Network = (function () {
     var socket;
-    var url = 'http://192.168.1.101:3700';
+    var url = 'http://localhost:3700';
 
     var REQUEST_JUMP = 'bird-jump';
     var REQUEST_UPDATE_STATE = 'state-update';

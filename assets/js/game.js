@@ -316,7 +316,11 @@ var Game = (function () {
             });
 
             Network.on.bird_death(function(data) {
-                if (data !== bird.player_id && current_state == states.GAME_SCREEN) bird_array[data].die();
+                if (data !== bird.player_id && current_state == states.GAME_SCREEN) {
+                    Animator.end_bird_animations(data);
+                    bird_array[data].die();
+                    Animator.move_bird_back(data);
+                }
             });
 
             Animator.end_animations();

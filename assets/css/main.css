@@ -49,19 +49,19 @@
    100% { background-position: -275px 100%; }
 }
 
-@-webkit-keyframes animBird {
+@-webkit-keyframes animBirdWings {
    from { background-position: 0px 0px; }
    to { background-position: 0px -96px; }
 }
-@-moz-keyframes animBird {
+@-moz-keyframes animBirdWings {
    from { background-position: 0px 0px; }
    to { background-position: 0px -96px; }
 }
-@-o-keyframes animBird {
+@-o-keyframes animBirdWings {
    from { background-position: 0px 0px; }
    to { background-position: 0px -96px; }
 }
-@keyframes animBird {
+@keyframes animBirdWings {
    from { background-position: 0px 0px; }
    to { background-position: 0px -96px; }
 }
@@ -147,7 +147,7 @@ body
    height: 100%;
    left: -110px;
    background-color: white;
-   z-index: 11;
+   z-index: 15;
 }
 
 #gamescreen
@@ -330,9 +330,11 @@ body
    height: 24px;
    background-image: url('../images/bird.png');
    z-index: 11;
-   
-   -webkit-animation: animBird 300ms steps(4) infinite;
-   animation: animBird 300ms steps(4) infinite;
+}
+
+.bird-flapping-wings {
+   -webkit-animation: animBirdWings 300ms steps(4) infinite;
+   animation: animBirdWings 300ms steps(4) infinite;
 }
 
 .pipe

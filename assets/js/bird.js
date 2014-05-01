@@ -36,7 +36,7 @@ function Bird (velocity, position, rotation, player_id) {
 
 	   	var birds_container = document.getElementById("birds");
 	   	var new_bird = document.createElement("div");
-	   	new_bird.className = "bird animated";
+	   	new_bird.className = "bird bird-flapping-wings animated";
 	   	new_bird.id = this.player_id;
 	   	birds_container.appendChild(new_bird);
 
@@ -168,6 +168,7 @@ function Bird (velocity, position, rotation, player_id) {
 
 	this.die = function(){
 		this.is_dead = true;
+
 		//drop the bird to the floor
 		var player_bottom = $("#"+this.player_id).position().top + $("#"+this.player_id).width(); //we use width because he'll be rotated 90 deg
 		var floor = $("#flyarea").height();
