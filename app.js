@@ -29,6 +29,17 @@ io.sockets.on('connection', function (socket) {
     	socket.emit('pipe-response', { pipe : pipe_module.get_pipe(data), pipe_id : data } );
     });
 
+    socket.on('pipe-death-counter-request', function (data) {
+        var return_package = [];
+
+        for (var i = 0; i < data.length; i++) {
+            return_package.push({ index : data[i],
+                death_counter : pipe_module.get_pipe(data[i]).death_counter });
+        }
+
+        socket.emit('pipe-death-counter-response', return_package);
+    });
+
     //asking for all the birds
     socket.on('sync-request', function(data) {
     	socket.emit('sync-response', client_module.generate_client_package(data));
@@ -46,9 +57,9 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('bird-death-request', function(data){
-        var temp = pipe_module.get_pipe(data.client_score).death_counter++;
+        pipe_module.get_pipe(data.client_score).death_counter++;
         client_module.all[data.client_id].start_game_timestamp = null;
-    	io.sockets.emit('bird-death-response', { client_id : data.client_id, pipe : { index : data.client_score, death_counter : temp + 1 }});
+    	io.sockets.emit('bird-death-response', data.client_id);
     });
 
     socket.on('state-update', function(data){

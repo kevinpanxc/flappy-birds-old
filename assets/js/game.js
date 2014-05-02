@@ -23,7 +23,15 @@ var Pipes = (function () {
         },
 
         get_pipe: function (index) {
-            return all[index];
+            if (all[index] == undefined) return null;
+            else return all[index].pipe;
+        },
+
+        get_next_five_pipe_indices : function () {
+            var indices_array = [];
+            var max_index = all.length >= 5 ? 5 : all.length;
+            for (var i = 0; i < max_index; i++) indices_array.push(all[i].index);
+            return indices_array;
         },
 
         add_pipe_to_fly_area: function (data) {
@@ -33,7 +41,7 @@ var Pipes = (function () {
                 <div class="pipe_death_counter" id="pipe_' + data.pipe_id + '">' + format_pipe_death_string(data.pipe.death_counter) + '</div>\
             </div>');
             $("#flyarea").append(new_pipe);
-            all.push(new_pipe);
+            all.push({ index : data.pipe_id, pipe : new_pipe });
         },
 
         clear_pipes: function () {
@@ -74,6 +82,7 @@ var Game = (function () {
     var loop_game;
     var loop_pipe;
     var loop_check_connection;
+    var loop_pipe_death_counter_updater;
 
     var get_cookie = function (c_name) {
         var name = c_name + "=";
@@ -99,9 +108,10 @@ var Game = (function () {
     }
 
     var show_splash = function () {
+        clearInterval(loop_pipe_death_counter_updater);
         remove_all_birds();
-        Sounds.play_swoosh();
         remove_pipes();
+        Sounds.play_swoosh();
         fade_in_splash();
     }
 
@@ -178,6 +188,10 @@ var Game = (function () {
 
         loop_game = setInterval(game_loop_function, update_rate);
         loop_pipe = setInterval(pipe_loop_function, 1400);
+        loop_pipe_death_counter_updater = setInterval(function () {
+            console.log("HELLO!");
+            Network.send.update_pipe_death_counter(Pipes.get_next_five_pipe_indices());
+        }, 1000);
 
         bird.jump();
     }
@@ -331,13 +345,18 @@ var Game = (function () {
                 }
             });
 
-            Network.on.bird_death(function(data) {
-                if (data.client_id !== bird.player_id && current_state == states.GAME_SCREEN) {
-                    Animator.end_bird_animations(data.client_id);
-                    bird_array[data.client_id].die();
-                    Animator.move_bird_back(data.client_id);
+            Network.on.pipe_death_counter_info_returned(function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    Pipes.update_pipe_death_counter(data[i].index, data[i].death_counter);
                 }
-                Pipes.update_pipe_death_counter(data.pipe.index, data.pipe.death_counter);
+            });
+
+            Network.on.bird_death(function(data) {
+                if (data !== bird.player_id && current_state == states.GAME_SCREEN) {
+                    Animator.end_bird_animations(data);
+                    bird_array[data].die();
+                    Animator.move_bird_back(data);
+                }
             });
 
             Animator.end_animations();

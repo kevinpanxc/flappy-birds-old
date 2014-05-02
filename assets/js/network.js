@@ -10,6 +10,7 @@ var Network = (function () {
     var REQUEST_REGISTER = 'register-request';
     var REQUEST_SYNC = 'sync-request';
     var REQUEST_CLIENT_LIST = 'client-list-request';
+    var REQUEST_PIPE_DEATH_COUNTER = 'pipe-death-counter-request';
 
     var RESPONSE_REGISTER = 'register-response';
     var RESPONSE_NEW_PIPE = 'pipe-response';
@@ -17,6 +18,7 @@ var Network = (function () {
     var RESPONSE_SYNC = 'sync-response';
     var RESPONSE_DEATH = 'bird-death-response';
     var RESPONSE_CLIENT_LIST = 'client-list-response';
+    var RESPONSE_PIPE_DEATH_COUNTER = 'pipe-death-counter-response';
 
     var jump = function (data) {
         socket.emit(REQUEST_JUMP, data);
@@ -50,6 +52,10 @@ var Network = (function () {
         socket.emit(REQUEST_CLIENT_LIST, data);
     }
 
+    var update_pipe_death_counter = function (data) {
+        socket.emit(REQUEST_PIPE_DEATH_COUNTER, data);
+    }
+
     var register_success = function (callback) {
         socket.on(RESPONSE_REGISTER, callback);
     }
@@ -74,6 +80,10 @@ var Network = (function () {
         socket.on(RESPONSE_CLIENT_LIST, callback);
     }
 
+    var pipe_death_counter_info_returned = function (callback) {
+        socket.on(RESPONSE_PIPE_DEATH_COUNTER, callback);
+    }
+
     return {
         send : {
             jump : jump,
@@ -90,7 +100,9 @@ var Network = (function () {
 
             sync : sync,
 
-            client_list : client_list
+            client_list : client_list,
+
+            update_pipe_death_counter : update_pipe_death_counter
         },
 
         on : {
@@ -104,7 +116,9 @@ var Network = (function () {
 
             bird_death : bird_death,
 
-            client_list_returned : client_list_returned
+            client_list_returned : client_list_returned,
+
+            pipe_death_counter_info_returned : pipe_death_counter_info_returned
         },
 
         initialize : function () {
