@@ -1,4 +1,4 @@
-function Bird (velocity, position, rotation, player_id) {
+function Bird (player_id, is_main_client, velocity, y_position, rotation) {
 	var gravity = 0;
 	var jump = 0;
 
@@ -10,21 +10,22 @@ function Bird (velocity, position, rotation, player_id) {
 
 	this.player_id = player_id;
 	this.velocity = velocity;
-	this.position = position;
+	this.y_position = y_position;
 	this.rotation = rotation;
 	this.score = 0;
 	this.is_dead = false;
+	this.is_main_client = is_main_client;
 
 	this.reset = function(){
 		this.is_dead = false;
 
-		this.add_to_fly_area(0);
-
 		//set the defaults (again)
 		this.velocity = 0;
-		this.position = 180;
+		this.y_position = 180;
 		this.rotation = 0;
 		this.score = 0;
+
+		this.add_to_fly_area(0);
 
 		//update the player in preparation for the next game
 		this.update_bird();
@@ -38,9 +39,10 @@ function Bird (velocity, position, rotation, player_id) {
 	   	var new_bird = document.createElement("div");
 	   	new_bird.className = "bird bird-flapping-wings animated";
 	   	new_bird.id = this.player_id;
+	   	if (!this.is_main_client) new_bird.style.opacity = "0.5";
 	   	birds_container.appendChild(new_bird);
 
-	   	$(new_bird).css({ x: 60 + time_diff * 0.1333});		
+	   	$(new_bird).css({ x: 60 + time_diff * 0.1333, top: this.y_position});		
 	}
 
 	this.remove = function () {
@@ -63,13 +65,13 @@ function Bird (velocity, position, rotation, player_id) {
    		var player = $("#"+this.player_id);
 
 	   	this.velocity += gravity;
-	   	this.position += this.velocity;
+	   	this.y_position += this.velocity;
 
 	   	//rotation
 	   	this.rotation = Math.min((this.velocity / 10) * 90, 90);
 	   
-	   	//apply rotation and position
-	   	$(player).css({ rotate: this.rotation, top: this.position });
+	   	//apply rotation and y_position
+	   	$(player).css({ rotate: this.rotation, top: this.y_position });
 	}
 
 	this.check_alive = function(){
@@ -109,7 +111,7 @@ function Bird (velocity, position, rotation, player_id) {
 	}
 
 	this.do_not_allow_bird_to_fly_higher = function () {
-		this.position = 0;
+		this.y_position = 0;
 	}
 
 	this.no_pipes_yet = function () {

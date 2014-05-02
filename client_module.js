@@ -5,12 +5,14 @@ var states = Object.freeze({
     PLAYING: 1
 });
 
-function Client(client_id) {
+function Client(client_id, username) {
     if (arguments.length === 0) this.id = this.random_string(16, 'aA');
     else this.id = client_id;
 
+    this.username = this.id;
+
     this.velocity = 0;
-    this.position = 180;
+    this.y_position = 180;
     this.rotation = 0;
 
     this.state = states.IDLE;

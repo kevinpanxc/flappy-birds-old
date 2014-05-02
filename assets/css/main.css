@@ -420,7 +420,7 @@ body
    background-position: center;
 }
 
-.pipe_lower:after
+.pipe_lower:before
 {
    content: "";
    position: absolute;
@@ -428,6 +428,18 @@ body
    width: 52px;
    height: 26px;
    background-image: url('../images/pipe-up.png');
+}
+
+.pipe_death_counter
+{
+   position: absolute;
+   height: 20px;
+   line-height: 20px;
+   width: 100px;
+   left: 50%;
+   margin-left: -50px;
+   text-align: center;
+   bottom: -20px;
 }
 
 #footer

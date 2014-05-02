@@ -4,6 +4,11 @@ var Pipes = (function () {
     var pipe_width = 52;
     var all = new Array();
 
+    var format_pipe_death_string = function (deaths) {
+        if (deaths === 1) return '1 death';
+        else return deaths + ' deaths';
+    }
+
     return {
         get_pipe_and_increment_pipe_index: function () {
             return pipe_index++;
@@ -21,8 +26,14 @@ var Pipes = (function () {
             return all[index];
         },
 
-        push_pipe: function (pipe) {
-            all.push(pipe);
+        add_pipe_to_fly_area: function (data) {
+            var new_pipe = $('<div class="pipe animated">\
+                <div class="pipe_upper" style="height: ' + data.pipe.top_height + 'px;"></div>\
+                <div class="pipe_lower" style="height: ' + data.pipe.bottom_height + 'px;"></div>\
+                <div class="pipe_death_counter" id="pipe_' + data.pipe_id + '">' + format_pipe_death_string(data.pipe.death_counter) + '</div>\
+            </div>');
+            $("#flyarea").append(new_pipe);
+            all.push(new_pipe);
         },
 
         clear_pipes: function () {
@@ -39,6 +50,10 @@ var Pipes = (function () {
 
         reset_index: function (){
             pipe_index = 0;
+        },
+
+        update_pipe_death_counter: function (index, death_counter) {
+            $('#pipe_' + index).html(format_pipe_death_string(death_counter));
         }
     }
 })();
@@ -77,9 +92,8 @@ var Game = (function () {
         document.cookie = c_name + "=" + c_value + "; " + expires;
     }
 
-    var add_bird = function(data) {
-        console.log(data);
-        var new_bird = new Bird(data.velocity, data.position, data.rotation, data.id);
+    var add_external_client_as_bird = function(data) {
+        var new_bird = new Bird(data.id, false, data.velocity, data.y_position, data.rotation);
         new_bird.add_to_fly_area(data.time_diff);
         bird_array[data.id] = new_bird;
     }
@@ -169,7 +183,7 @@ var Game = (function () {
     }
 
     var end_run = function () {
-        Network.send.death(bird.player_id);
+        Network.send.death({ client_id : bird.player_id, client_score : bird.score });
         Network.send.update_state({ client_id : bird.player_id, state : "IDLE" })
         bird.die();
 
@@ -248,7 +262,7 @@ var Game = (function () {
         //Do any pipes need removal?
         $(".pipe").filter(function() { return $(this).position().left <= -100; }).remove();
 
-        Network.send.new_pipe({ index: Pipes.get_pipe_and_increment_pipe_index() });
+        Network.send.new_pipe(Pipes.get_pipe_and_increment_pipe_index());
     }
 
     var is_incompatible = {
@@ -286,8 +300,8 @@ var Game = (function () {
             current_state = states.WAITING_FOR_SERVER;
 
             Network.on.register_success(function(data) {
-                bird = new Bird(0, 180, 0, data.client_id);
-                bird.reset();
+                bird = new Bird(data.client_id, true, 0, 180, 0);
+                bird.add_to_fly_area(0);
 
                 ExternalUI.update_connected_clients_count(Object.keys(data.clients).length);
 
@@ -303,9 +317,7 @@ var Game = (function () {
             });
 
             Network.on.pipe_returned(function(data) {
-                var new_pipe = $('<div class="pipe animated"><div class="pipe_upper" style="height: ' + data.topheight + 'px;"></div><div class="pipe_lower" style="height: ' + data.bottomheight + 'px;"></div></div>');
-                $("#flyarea").append(new_pipe);
-                Pipes.push_pipe(new_pipe);            
+                Pipes.add_pipe_to_fly_area(data);
             });
 
             Network.on.bird_jumped(function(data) {
@@ -315,16 +327,17 @@ var Game = (function () {
             Network.on.sync_success(function(data) {
                 bird_array = {};
                 for (client in data) {
-                    add_bird(data[client]);
+                    add_external_client_as_bird(data[client]);
                 }
             });
 
             Network.on.bird_death(function(data) {
-                if (data !== bird.player_id && current_state == states.GAME_SCREEN) {
-                    Animator.end_bird_animations(data);
-                    bird_array[data].die();
-                    Animator.move_bird_back(data);
+                if (data.client_id !== bird.player_id && current_state == states.GAME_SCREEN) {
+                    Animator.end_bird_animations(data.client_id);
+                    bird_array[data.client_id].die();
+                    Animator.move_bird_back(data.client_id);
                 }
+                Pipes.update_pipe_death_counter(data.pipe.index, data.pipe.death_counter);
             });
 
             Animator.end_animations();

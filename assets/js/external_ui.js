@@ -16,7 +16,7 @@ var ExternalUI = (function () {
         client_text.className = "client-text";
 
         var client_id = document.createElement("div");
-        client_id.className = "client-id";
+        client_id.className = "client-name";
 
         var client_status = document.createElement("div");
         client_status.className = "client-status";
@@ -49,7 +49,7 @@ var ExternalUI = (function () {
                 client_node_jquery.find(".client-status").html("Playing");
             }
 
-            client_node_jquery.find(".client-id").html(client.id);
+            client_node_jquery.find(".client-name").html(client.username);
 
             $client_list.append(client_node_jquery);
         }
