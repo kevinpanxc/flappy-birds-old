@@ -79,7 +79,7 @@ var ExternalUI = (function () {
         },
 
         remove_loading_blocker : function () {
-            $(".loading").remove();
+            $(".loading").fadeOut("fast");
         },
 
         update_connected_clients_count : update_connected_clients_count,

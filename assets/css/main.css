@@ -175,8 +175,8 @@ body
    left: 0;
    width: 100%;
    height: 100%;
-   background-color: #dbd693;
-   opacity: 0.5;
+   background-color: white;
+   opacity: 0.2;
    z-index: 20;
 }
 
@@ -188,17 +188,26 @@ body
    height: 60px;
    margin-left: -15%;
    margin-top: -30px;
-   line-height: 60px;
-   background-color: #dbd693;
-   border-radius: 8px;
-   border: solid #4d3b43 2px;
+   line-height: 50px;
+   background-color: white;
+   border: solid #999999 5px;
+   border-radius: 16px;
    text-align: center;
    font-family: "Lato";
-   color: black;
+   color: #222;
    font-weight: bold;
    font-size: 22px;
    opacity: 1.0;
    z-index: 21;
+}
+
+#loading-bird {
+    display: inline-block;
+    width: 34px;
+    height: 24px;
+    margin-right: 10px;
+    margin-bottom: -3px;
+    background-image: url('../images/bird.png');
 }
 
 #sky
