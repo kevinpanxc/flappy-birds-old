@@ -103,7 +103,8 @@ var Game = (function () {
 
     var add_external_client_as_bird = function(data) {
         var new_bird = new Bird(data.id, false, data.velocity, data.y_position, data.rotation);
-        new_bird.add_to_fly_area(data.time_diff);
+        // 6750 milliseconds is 900 pixels, which is just halfway through the client screen (will block bird)
+        if (data.time_diff >= 0 && data.time_diff < 6750) new_bird.add_to_fly_area(data.time_diff);
         bird_array[data.id] = new_bird;
     }
 
@@ -165,7 +166,7 @@ var Game = (function () {
     var screen_click = function () {
         if (current_state == states.GAME_SCREEN) {
             Network.send.jump(bird.player_id);
-            Network.send.update_state({ client_id : bird.player_id, state : "PLAYING" });
+            Network.send.update_client({ client_id : bird.player_id, state : "PLAYING", score : bird.score });
             bird.jump();
         } else if (current_state == states.SPLASH_SCREEN) {
             start_run();
@@ -178,7 +179,7 @@ var Game = (function () {
 
         Network.send.start_game(bird.player_id);
         Network.send.sync(bird.player_id);
-        Network.send.update_state({ client_id : bird.player_id, state : "PLAYING" });
+        Network.send.update_client({ client_id : bird.player_id, state : "PLAYING", score : 0 });
 
         fade_out_splash();
 
@@ -189,7 +190,6 @@ var Game = (function () {
         loop_game = setInterval(game_loop_function, update_rate);
         loop_pipe = setInterval(pipe_loop_function, 1400);
         loop_pipe_death_counter_updater = setInterval(function () {
-            console.log("HELLO!");
             Network.send.update_pipe_death_counter(Pipes.get_next_five_pipe_indices());
         }, 1000);
 
@@ -198,7 +198,6 @@ var Game = (function () {
 
     var end_run = function () {
         Network.send.death({ client_id : bird.player_id, client_score : bird.score });
-        Network.send.update_state({ client_id : bird.player_id, state : "IDLE" })
         bird.die();
 
         Animator.end_animations();
@@ -322,7 +321,7 @@ var Game = (function () {
                 ExternalUI.update_connected_clients_list(data.clients);
 
                 loop_check_connection = setInterval(function () {
-                    Network.send.update_state({ client_id : bird.player_id });
+                    Network.send.update_client({ client_id : bird.player_id });
                 }, 5000);
 
                 current_state = states.SPLASH_SCREEN;

@@ -105,8 +105,7 @@
 
 *,
 *:before,
-*:after
-{
+*:after {
    /* border box */
    -moz-box-sizing: border-box;
    -webkit-box-sizing: border-box;
@@ -123,25 +122,20 @@
 }
 
 html,
-body
-{
-   height: 100%;
-   overflow: hidden;
-   font-family: monospace;
+body {
+   /*font-family: monospace;*/
    font-size: 12px;
-   color: #fff;
+   /*color: #fff;*/
 }
 
-#gamecontainer
-{
+#gamecontainer {
    position: relative;
    margin: 0 auto;
    width: 1000px;
    height: 545px;
 }
 
-#pipe-blocker
-{
+#pipe-blocker {
    position: absolute;
    width: 110px;
    height: 100%;
@@ -150,27 +144,24 @@ body
    z-index: 15;
 }
 
-#gamescreen
-{
+#gamescreen {
    position: absolute;
    left: 0;
    width: 80%;
    height: 100%;
 }
 
-#clientscreen
-{
+#clientscreen {
    position: absolute;
    right: 0;
    width: 20%;
    height: 100%;
    background-color: #ddd;
-   z-index: 11;
+   z-index: 12;
    overflow-y: scroll;
 }
 
-#loading-blocker
-{
+#loading-blocker {
    position: absolute;
    left: 0;
    width: 100%;
@@ -210,8 +201,7 @@ body
     background-image: url('../images/bird.png');
 }
 
-#sky
-{
+#sky {
    position: absolute;
    top: 0;
    width: 100%;
@@ -225,16 +215,14 @@ body
    animation: animSky 7s linear infinite;
 }
 
-#flyarea
-{
+#flyarea {
    position: absolute;
    bottom: 0;
    height: 420px;
    width: 100%;
 }
 
-#ceiling
-{
+#ceiling {
    position: absolute;
    top: -16px;
    height: 16px;
@@ -246,8 +234,7 @@ body
    animation: animCeiling 481ms linear infinite;
 }
 
-#land
-{
+#land {
    position: absolute;
    bottom: 0;
    width: 100%;
@@ -261,22 +248,19 @@ body
    animation: animLand 2516ms linear infinite;
 }
 
-#bigscore
-{
+#bigscore {
    position: absolute;
    top: 20px;
    left: 150px;
    z-index: 100;
 }
 
-#bigscore img
-{
+#bigscore img {
    display: inline-block;
    padding: 1px;
 }
 
-#splash
-{
+#splash {
    position: absolute;
    opacity: 0;
    top: 75px;
@@ -287,8 +271,7 @@ body
    background-repeat: no-repeat;
 }
 
-#scoreboard
-{
+#scoreboard {
    position: absolute;
    display: none;
    opacity: 0;
@@ -302,8 +285,7 @@ body
    z-index: 1000;
 }
 
-#medal
-{
+#medal {
    position: absolute;
    opacity: 0;
    top: 114px;
@@ -312,8 +294,7 @@ body
    height: 44px;
 }
 
-#currentscore
-{
+#currentscore {
    position: absolute;
    top: 105px;
    left: 107px;
@@ -322,13 +303,11 @@ body
    text-align: right;
 }
 
-#currentscore img
-{
+#currentscore img {
    padding-left: 2px;
 }
 
-#highscore
-{
+#highscore {
    position: absolute;
    top: 147px;
    left: 107px;
@@ -337,13 +316,11 @@ body
    text-align: right;
 }
 
-#highscore img
-{
+#highscore img {
    padding-left: 2px;
 }
 
-#replay
-{
+#replay {
    position: absolute;
    opacity: 0;
    top: 205px;
@@ -353,8 +330,7 @@ body
    cursor: pointer;
 }
 
-.boundingbox
-{
+.boundingbox {
    position: absolute;
    display: none;
    top: 0;
@@ -364,8 +340,7 @@ body
    border: 1px solid red;
 }
 
-.bird
-{
+.bird {
    position: absolute;
    width: 34px;
    height: 24px;
@@ -378,8 +353,7 @@ body
    animation: animBirdWings 300ms steps(4) infinite;
 }
 
-.pipe
-{
+.pipe {
    position: absolute;
    left: -100px;
    width: 52px;
@@ -390,8 +364,7 @@ body
    animation: animPipe 7500ms linear;
 }
 
-.pipe_upper
-{
+.pipe_upper {
    position: absolute;
    top: 0;
    width: 52px;
@@ -400,8 +373,7 @@ body
    background-position: center;
 }
 
-.pipe_upper:after
-{
+.pipe_upper:after {
    content: "";
    position: absolute;
    bottom: 0;
@@ -410,8 +382,7 @@ body
    background-image: url('../images/pipe-down.png');
 }
 
-.pipe_lower
-{
+.pipe_lower {
    position: absolute;
    bottom: 0;
    width: 52px;
@@ -420,8 +391,7 @@ body
    background-position: center;
 }
 
-.pipe_lower:before
-{
+.pipe_lower:before {
    content: "";
    position: absolute;
    top: 0;
@@ -430,20 +400,20 @@ body
    background-image: url('../images/pipe-up.png');
 }
 
-.pipe_death_counter
-{
+.pipe_death_counter {
    position: absolute;
    height: 20px;
    line-height: 20px;
-   width: 100px;
+   width: 124px;
    left: 50%;
-   margin-left: -50px;
+   margin-left: -62px;
    text-align: center;
    bottom: -20px;
+   font-family: monospace;
+   color: white;
 }
 
-#footer
-{
+#footer {
    position: absolute;
    bottom: 3px;
    left: 3px;
@@ -453,8 +423,7 @@ body
 #footer a:link,
 #footer a:visited,
 #footer a:hover,
-#footer a:active
-{
+#footer a:active {
    display: block;
    padding: 2px;
    text-decoration: none;

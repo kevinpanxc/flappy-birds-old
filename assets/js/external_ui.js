@@ -2,7 +2,9 @@ var ExternalUI = (function () {
     var PLAYING_COLOR = "#15CF00";
     var IDLE_COLOR = "#ABABAB";
 
-    var loop_client_list;
+    var loop_refresh_client_list;
+    var loop_refresh_client_scores;
+
     var cloneable_node;
     var $client_list;
     var $client_count;
@@ -18,11 +20,20 @@ var ExternalUI = (function () {
         var client_id = document.createElement("div");
         client_id.className = "client-name";
 
+        var client_status_and_score_parent = document.createElement("div");
+        client_status_and_score_parent.className = "client-status-and-score-parent";
+
         var client_status = document.createElement("div");
         client_status.className = "client-status";
 
+        var client_score = document.createElement("div");
+        client_score.className = "client-score";
+
+        client_status_and_score_parent.appendChild(client_status);
+        client_status_and_score_parent.appendChild(client_score);
+
         client_text.appendChild(client_id);
-        client_text.appendChild(client_status);
+        client_text.appendChild(client_status_and_score_parent);
 
         parent.appendChild(client_color);
         parent.appendChild(client_text);
@@ -47,6 +58,9 @@ var ExternalUI = (function () {
             } else {
                 client_node_jquery.find(".client-color").css( "background-color", PLAYING_COLOR );
                 client_node_jquery.find(".client-status").html("Playing");
+
+                client_node_jquery.find(".client-score").html(client.score);
+                client_node_jquery.find(".client-score").attr("id", "score-" + client.id);
             }
 
             client_node_jquery.find(".client-name").html(client.username);
@@ -57,6 +71,13 @@ var ExternalUI = (function () {
 
     var update_connected_clients_count = function (count) {
         $client_count.html(count);
+    }
+
+    var update_connected_clients_score = function (data) {
+        for (var client_id in data) {
+            var client = data[client_id];
+            $("#score-" + client.id).html(client.score);
+        }
     }
 
     return {
@@ -73,9 +94,17 @@ var ExternalUI = (function () {
                 update_connected_clients_list(data);
             });
 
-            loop_client_list = setInterval(function () {
-                Network.send.client_list(null);
-            }, 3000);
+            Network.on.client_score_returned(function (data) {
+                update_connected_clients_score(data);
+            });
+
+            $("#about-button").click(function () {
+                $("#about").toggle("fast", function () {
+                    $('html, body').animate({
+                        scrollTop: $("#about").offset().top
+                    }, 2000);
+                });
+            });
         },
 
         remove_loading_blocker : function () {

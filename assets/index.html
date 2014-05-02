@@ -1,44 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--
-   Copyright 2014 Nebez Briefkani
-   floppybird - index.html
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
--->
-
    <head>
-      <title>Flappy Birds</title>
+      <title>Flappy BirdS</title>
       <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-      <meta name="author" content="Nebez Briefkani" />
-      <meta name="description" content="play floppy bird. a remake of popular game flappy bird using just html/css/js" />
-      <meta name="keywords" content="flappybird,flappy,bird,floppybird,floppy,html,html5,css,css3,js,javascript,jquery,github,nebez,briefkani,nebezb,open,source,opensource" />
+      <meta name="author" content="Kevin Pan" />
+      <meta name="description" content="An experimental online multiplayer Flappy Bird game" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 
       <!-- Open Graph tags -->
-      <meta property="og:title" content="Floppy Bird" />
-      <meta property="og:description" content="play floppy bird. a remake of popular game flappy bird using just html/css/js" />
+      <meta property="og:title" content="Flappy BirdS" />
+      <meta property="og:description" content="An experimental online multiplayer Flappy Bird game" />
       <meta property="og:type" content="website" />
       <meta property="og:image" content="http://nebez.github.io/floppybird/assets/thumb.png" />
-      <meta property="og:url" content="http://nebez.github.io/floppybird/" />
-      <meta property="og:site_name" content="Floppy Bird" />
+      <meta property="og:url" content="" />
+      <meta property="og:site_name" content="Flappy BirdS" />
       
       <!-- Style sheets -->
       <link href="css/reset.css" rel="stylesheet">
       <link href="css/main.css" rel="stylesheet">
       <link href="css/birds.css" rel="stylesheet">
 
-      <!-- Font -->
+      <!-- Google Fonts -->
       <link href="http://fonts.googleapis.com/css?family=Open+Sans|Lato" rel="stylesheet" type="text/css">
    </head>
    <body>
@@ -65,7 +47,7 @@
             </div>
          </div>
          <div id="clientscreen">
-            <div id="client-title">Welcome</div>
+            <div id="client-count"><span>0</span> online</div>
             <ul></ul>
          </div>
          <div id="loading-blocker" class="loading"></div>
@@ -73,8 +55,15 @@
             <div id="loading-bird" class="bird-flapping-wings"></div>CONNECTING...
          </div>
       </div>
-      <h1><span>Flappy</span><div class="title-image"></div><span>Birds</span></h1>
-      <div id="client-count"><span>0</span> birds connected</div>
+      <h1><span>flappy</span><div class="title-image"></div><span>bird<span style="color: brown">s</span></span></h1>
+      <div class="nav-parent"><span class="nav-button" id="about-button">About</span> | <a class="nav-button" href="https://github.com/kevinpanxc/flappy-birds">GitHub</a> | <a class="nav-button" id="developer-website" href="http://www.kevinpan.ca">Developer's Website</a></div>
+
+      <div id="about">
+         Flappy BirdS is an experimental online multiplayer Flappy Bird game using <b>node.js</b> and <b>Socket.IO</b>. I took <a href="http://nebezb.com/">Nebez Briefkani's</a> JS/CSS/HTML recreation of <a href="http://www.dotgears.com/">Dong Nguyen's</a> original Flappy Bird game and added a backend component to it.</br></br>
+
+         This is the first iteration for Flappy BirdS. There is a lot of logic on the frontend that I would like to move to the backend. This has also introduced a lot of limitations to the multiplayer aspect of the game that you will notice as you play. Moving forwards, I plan to create my own clientside for Flappy BirdS and move most of the game logic to the backend.</br></br>
+      </div>
+
 <!--       <div id="footer">
          <a href="http://www.dotgears.com/">original game/concept/art by dong nguyen</a>
          <a href="http://nebezb.com/">recreated by nebez briefkani</a>

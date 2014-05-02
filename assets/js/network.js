@@ -1,15 +1,14 @@
 var Network = (function () {
     var socket;
-    var url = 'http://localhost:3700';
+    var url = document.URL;
 
     var REQUEST_JUMP = 'bird-jump';
-    var REQUEST_UPDATE_STATE = 'state-update';
+    var REQUEST_CLIENT_STATE = 'client-update';
     var REQUEST_START_GAME = 'start-game';
     var REQUEST_DEATH = 'bird-death-request';
     var REQUEST_NEW_PIPE = 'pipe-request';
     var REQUEST_REGISTER = 'register-request';
     var REQUEST_SYNC = 'sync-request';
-    var REQUEST_CLIENT_LIST = 'client-list-request';
     var REQUEST_PIPE_DEATH_COUNTER = 'pipe-death-counter-request';
 
     var RESPONSE_REGISTER = 'register-response';
@@ -18,14 +17,15 @@ var Network = (function () {
     var RESPONSE_SYNC = 'sync-response';
     var RESPONSE_DEATH = 'bird-death-response';
     var RESPONSE_CLIENT_LIST = 'client-list-response';
+    var RESPONSE_CLIENT_SCORE = 'client-score-response';
     var RESPONSE_PIPE_DEATH_COUNTER = 'pipe-death-counter-response';
 
     var jump = function (data) {
         socket.emit(REQUEST_JUMP, data);
     }
 
-    var update_state = function (data) {
-        socket.emit(REQUEST_UPDATE_STATE, data);
+    var update_client = function (data) {
+        socket.emit(REQUEST_CLIENT_STATE, data);
     }
 
     var start_game = function (data) {
@@ -46,10 +46,6 @@ var Network = (function () {
 
     var sync = function (data) {
         socket.emit(REQUEST_SYNC, data);
-    }
-
-    var client_list = function (data) {
-        socket.emit(REQUEST_CLIENT_LIST, data);
     }
 
     var update_pipe_death_counter = function (data) {
@@ -80,6 +76,10 @@ var Network = (function () {
         socket.on(RESPONSE_CLIENT_LIST, callback);
     }
 
+    var client_score_returned = function (callback) {
+        socket.on(RESPONSE_CLIENT_SCORE, callback);
+    }
+
     var pipe_death_counter_info_returned = function (callback) {
         socket.on(RESPONSE_PIPE_DEATH_COUNTER, callback);
     }
@@ -88,7 +88,7 @@ var Network = (function () {
         send : {
             jump : jump,
             
-            update_state : update_state,
+            update_client : update_client,
             
             start_game : start_game,
             
@@ -99,8 +99,6 @@ var Network = (function () {
             register : register,
 
             sync : sync,
-
-            client_list : client_list,
 
             update_pipe_death_counter : update_pipe_death_counter
         },
@@ -117,6 +115,8 @@ var Network = (function () {
             bird_death : bird_death,
 
             client_list_returned : client_list_returned,
+
+            client_score_returned : client_score_returned,
 
             pipe_death_counter_info_returned : pipe_death_counter_info_returned
         },

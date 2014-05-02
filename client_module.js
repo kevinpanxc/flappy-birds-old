@@ -14,6 +14,7 @@ function Client(client_id, username) {
     this.velocity = 0;
     this.y_position = 180;
     this.rotation = 0;
+    this.score = 0;
 
     this.state = states.IDLE;
 
@@ -39,6 +40,10 @@ Client.prototype.update_state = function (state) {
     this.state_timestamp = new Date().getTime();
 }
 
+Client.prototype.update_score = function (score) {
+    this.score = score;
+}
+
 module.exports = {
     add_new : function (client_id) {
         var new_client = null;
@@ -59,7 +64,7 @@ module.exports = {
         }
         return client_package;
     },
-    scan_states : function () {
+    scan_states : function (socket) {
         for (client_id in all) {
             client = all[client_id];
             state_time_diff = new Date().getTime() - client.state_timestamp;

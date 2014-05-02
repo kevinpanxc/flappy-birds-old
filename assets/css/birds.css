@@ -1,13 +1,16 @@
 h1 {
     color: black;
     font-family: "Lato", sans-serif;
-    font-size: 48px;
+    font-size: 60px;
     margin-top: 30px;
     font-weight: bold;
-    margin: 36px 22px 16px 22px;
+    margin: 20px 22px 16px 22px;
+    text-align: center;
+    color: #111;
+    letter-spacing: 1px;
 }
 
-#client-title {
+#client-count {
     color: #444;
     font-family: Helvetica;
     padding: 8px;
@@ -46,24 +49,71 @@ h1 {
 .client-name {
     color: #5a5a5a;
     font-size: 14px;
-    margin-bottom: 2px;
+    margin-bottom: 5px;
+}
+
+.client-status-and-score-parent div {
+    color: #777;
+    font-size: 12px;
 }
 
 .client-status {
-    color: #777;
-    font-size: 12px;
+    float:left;
+}
+
+.client-score {
+    float:right;
 }
 
 .title-image {
     display: inline-block;
     width: 34px;
     height: 24px;
-    margin: 0 5px;
+    margin: 0px 5px 3px 5px;
     background-image: url('../images/bird.png');
 }
 
-#client-count {
-    color: black;
+.nav-parent {
+    text-align: center;
     font-family: "Open Sans";
-    margin-left: 22px;
+    color: #222;
+    cursor: default;
+}
+
+.nav-parent .nav-button {
+    text-decoration: none;
+    color: #222;
+    cursor: pointer;
+}
+
+.nav-parent .nav-button:hover {
+    color: #555;
+}
+
+#developer-website {
+    color: #2DBBF7;
+    font-weight: bold;
+}
+
+#developer-website:hover {
+    color: #97DAF7;
+}
+
+#about {
+    display: none;
+    color: black;
+    color: #222;
+    font-family: "Open Sans";
+    font-size: 18px;
+    line-height: 25px;
+    width: 1000px;
+    margin: 24px auto 100px auto;
+}
+
+#about a {
+    text-decoration: none;
+}
+
+#about a:hover {
+    color: #555;
 }

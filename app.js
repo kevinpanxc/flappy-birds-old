@@ -18,6 +18,11 @@ var pipe_module = require("./pipe_module");
 // third party modules
 var moment = require('moment');
 
+// services
+var state_clean_up_service;
+var refresh_client_list_service;
+var refresh_client_score_service;
+
 // sockets event listening
 io.sockets.on('connection', function (socket) {
 	socket.on('register-request', function (data) {
@@ -58,22 +63,32 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('bird-death-request', function(data){
         pipe_module.get_pipe(data.client_score).death_counter++;
-        client_module.all[data.client_id].start_game_timestamp = null;
+        var client = client_module.all[data.client_id];
+        client.start_game_timestamp = null;
+        client.update_state("IDLE");
     	io.sockets.emit('bird-death-response', data.client_id);
     });
 
-    socket.on('state-update', function(data){
+    socket.on('client-update', function(data){
         if (client_module.all[data.client_id] == undefined) client_module.add_new(data.client_id);
 
-        if (typeof data.state !== "undefined") client_module.all[data.client_id].update_state(data.state);
-        else client_module.all[data.client_id].update_state();
+        var client = client_module.all[data.client_id];
 
-        console.log("STATE: " + client_module.all[data.client_id].state);
+        if (typeof data.state !== "undefined") client.update_state(data.state);
+        else client.update_state();
+
+        if (typeof data.score !== "undefined") client.update_score(data.score);
+
+        console.log("STATE: " + client.state);
     });
 
-    socket.on('client-list-request', function() {
-        socket.emit('client-list-response', client_module.all);
-    });
+    refresh_client_list_service = setInterval(function () {
+        io.sockets.emit('client-list-response', client_module.all);
+    }, 3000);
+
+    refresh_client_score_service = setInterval(function () {
+        io.sockets.emit('client-score-response', client_module.all);
+    }, 1000);
 });
 
-var state_clean_up_service = setInterval(client_module.scan_states, 1000);
+state_clean_up_service = setInterval(client_module.scan_states, 1000);
