@@ -5,11 +5,11 @@ var states = Object.freeze({
     PLAYING: 1
 });
 
-function Client(client_id, username) {
-    if (arguments.length === 0) this.id = this.random_string(16, 'aA');
+function Client(username, client_id) {
+    if (client_id == null) this.id = this.random_string(16, 'aA'); // undefined == null
     else this.id = client_id;
 
-    this.username = this.id;
+    this.username = username;
 
     this.velocity = 0;
     this.y_position = 180;
@@ -44,14 +44,26 @@ Client.prototype.update_score = function (score) {
     this.score = score;
 }
 
-module.exports = {
-    add_new : function (client_id) {
-        var new_client = null;
+function username_is_valid (username) {
+    if (typeof username === 'string'
+        && username.length > 0
+        && username.length < 20) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
-        if (arguments.length === 1) new_client = new Client(client_id);
-        else new_client = new Client();
-        all[new_client.id] = new_client;
-        return new_client.id;
+module.exports = {
+    add_new : function (username, client_id) {
+        var new_client = null;
+        if (username_is_valid(username)) {
+            new_client = new Client(username, client_id);
+            all[new_client.id] = new_client;
+            return new_client;
+        } else {
+            return false;
+        }
     },
     generate_client_package : function (from_client_id) {
         var client_package = {};
@@ -74,6 +86,9 @@ module.exports = {
                 if (state_time_diff > 10000) client.update_state("IDLE");
             }
         }
+    },
+    client_exists : function (client_id) {
+        return !(all[client_id] == undefined);
     },
     all : all
 }

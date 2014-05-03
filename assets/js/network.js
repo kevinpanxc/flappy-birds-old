@@ -11,7 +11,8 @@ var Network = (function () {
     var REQUEST_SYNC = 'sync-request';
     var REQUEST_PIPE_DEATH_COUNTER = 'pipe-death-counter-request';
 
-    var RESPONSE_REGISTER = 'register-response';
+    var RESPONSE_REGISTER_SUCCESS = 'register-success-response';
+    var RESPONSE_REGISTER_FAILURE = 'register-failure-response';
     var RESPONSE_NEW_PIPE = 'pipe-response';
     var RESPONSE_JUMP = 'bird-jumped';
     var RESPONSE_SYNC = 'sync-response';
@@ -53,7 +54,11 @@ var Network = (function () {
     }
 
     var register_success = function (callback) {
-        socket.on(RESPONSE_REGISTER, callback);
+        socket.on(RESPONSE_REGISTER_SUCCESS, callback);
+    }
+
+    var register_failure = function (callback) {
+        socket.on(RESPONSE_REGISTER_FAILURE, callback);
     }
 
     var pipe_returned = function (callback) {
@@ -105,6 +110,8 @@ var Network = (function () {
 
         on : {
             register_success : register_success,
+
+            register_failure : register_failure,
 
             pipe_returned : pipe_returned,
 

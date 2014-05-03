@@ -1,4 +1,4 @@
-function Bird (player_id, is_main_client, velocity, y_position, rotation) {
+function Bird (player_id, username, is_main_client, velocity, y_position, rotation) {
 	var gravity = 0;
 	var jump = 0;
 
@@ -9,6 +9,7 @@ function Bird (player_id, is_main_client, velocity, y_position, rotation) {
 	var ALIVE = true;
 
 	this.player_id = player_id;
+	this.username = username;
 	this.velocity = velocity;
 	this.y_position = y_position;
 	this.rotation = rotation;

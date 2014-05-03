@@ -102,7 +102,7 @@ var Game = (function () {
     }
 
     var add_external_client_as_bird = function(data) {
-        var new_bird = new Bird(data.id, false, data.velocity, data.y_position, data.rotation);
+        var new_bird = new Bird(data.id, data.username, false, data.velocity, data.y_position, data.rotation);
         // 6750 milliseconds is 900 pixels, which is just halfway through the client screen (will block bird)
         if (data.time_diff >= 0 && data.time_diff < 6750) new_bird.add_to_fly_area(data.time_diff);
         bird_array[data.id] = new_bird;
@@ -166,7 +166,7 @@ var Game = (function () {
     var screen_click = function () {
         if (current_state == states.GAME_SCREEN) {
             Network.send.jump(bird.player_id);
-            Network.send.update_client({ client_id : bird.player_id, state : "PLAYING", score : bird.score });
+            Network.send.update_client({ client_id : bird.player_id, username : bird.username, state : "PLAYING", score : bird.score });
             bird.jump();
         } else if (current_state == states.SPLASH_SCREEN) {
             start_run();
@@ -177,9 +177,9 @@ var Game = (function () {
         Animator.start_animations();
         current_state = states.GAME_SCREEN;
 
-        Network.send.start_game(bird.player_id);
+        Network.send.start_game({ client_id : bird.player_id, username : bird.username });
         Network.send.sync(bird.player_id);
-        Network.send.update_client({ client_id : bird.player_id, state : "PLAYING", score : 0 });
+        Network.send.update_client({ client_id : bird.player_id, username : bird.username, state : "PLAYING", score : 0 });
 
         fade_out_splash();
 
@@ -313,7 +313,8 @@ var Game = (function () {
             current_state = states.WAITING_FOR_SERVER;
 
             Network.on.register_success(function(data) {
-                bird = new Bird(data.client_id, true, 0, 180, 0);
+                bird = new Bird(data.client_id, data.username, true, 0, 180, 0);
+
                 bird.add_to_fly_area(0);
 
                 ExternalUI.update_connected_clients_count(Object.keys(data.clients).length);
@@ -321,12 +322,16 @@ var Game = (function () {
                 ExternalUI.update_connected_clients_list(data.clients);
 
                 loop_check_connection = setInterval(function () {
-                    Network.send.update_client({ client_id : bird.player_id });
+                    Network.send.update_client({ client_id : bird.player_id, username : bird.username });
                 }, 5000);
 
                 current_state = states.SPLASH_SCREEN;
 
                 ExternalUI.remove_loading_blocker();
+            });
+
+            Network.on.register_failure(function(data) {
+                ExternalUI.begin_registration(true);
             });
 
             Network.on.pipe_returned(function(data) {
@@ -362,7 +367,7 @@ var Game = (function () {
 
             show_splash();
 
-            Network.send.register(null);
+            ExternalUI.begin_registration(false);
         },
 
         setup_controls : function () {
@@ -384,9 +389,9 @@ var Game = (function () {
 $(function () {
     Network.initialize();
 
+    ExternalUI.initialize();
+
     Game.initialize();
 
     Game.setup_controls();
-
-    ExternalUI.initialize();
 });

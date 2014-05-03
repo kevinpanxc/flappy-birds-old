@@ -9,6 +9,10 @@ var ExternalUI = (function () {
     var $client_list;
     var $client_count;
 
+    var $loading_input_username;
+    var $loading_connecting_message;
+    var $loading_input_username_invalid;
+
     var initialize_cloneable_node = function () {
         var parent = document.createElement("li");
         var client_color = document.createElement("div");
@@ -80,11 +84,49 @@ var ExternalUI = (function () {
         }
     }
 
+    var begin_registration = function (show_error_message) {
+        $loading_connecting_message.hide();
+        $loading_input_username.show();
+
+        if (show_error_message === true) $loading_input_username_invalid.show();
+
+        enable_character_username_submission();
+    }
+
+    var show_connecting_message = function () {
+        $loading_connecting_message.show();
+        $loading_input_username.hide();
+    }
+
+    var enable_character_username_submission = function () {
+        document.onkeydown = function (event) {
+            var e = e || window.event;
+
+            if (e.keyCode === 13) {
+                var username = $("#loading-input-username input").val();
+                Network.send.register(username);
+                $loading_input_username_invalid.hide();
+                disable_character_username_submission();
+                show_connecting_message();
+            }
+        }
+    }
+
+    var disable_character_username_submission = function () {
+        document.onkeydown = function () {}
+    }
+
     return {
         initialize : function () {
             $client_list = $("#clientscreen ul");
 
             $client_count = $("#client-count span");
+
+            $loading_input_username = $("#loading-input-username");
+
+            $loading_connecting_message = $("#loading-message");
+
+            $loading_input_username_invalid = $("#loading-input-username-invalid");
 
             cloneable_node = initialize_cloneable_node();
 
@@ -108,11 +150,16 @@ var ExternalUI = (function () {
         },
 
         remove_loading_blocker : function () {
+            $loading_connecting_message.hide();
+            $loading_input_username.hide();
+
             $(".loading").fadeOut("fast");
         },
 
         update_connected_clients_count : update_connected_clients_count,
 
-        update_connected_clients_list : update_connected_clients_list
+        update_connected_clients_list : update_connected_clients_list,
+
+        begin_registration : begin_registration
     }
 })();

@@ -26,8 +26,15 @@ var refresh_client_score_service;
 // sockets event listening
 io.sockets.on('connection', function (socket) {
 	socket.on('register-request', function (data) {
-        return_package = { client_id : client_module.add_new(), clients : client_module.all }
-		socket.emit('register-response', return_package);
+        var new_client = client_module.add_new(data, null);
+
+        if (new_client !== false) {
+            var return_package = { client_id : new_client.id, username : new_client.username, clients : client_module.all }
+            socket.emit('register-success-response', return_package);
+            delete client_module.all[new_client.id];
+        } else {
+            socket.emit('register-failure-response', null);
+        }
 	});
 
     socket.on('pipe-request', function (data) {
@@ -52,8 +59,9 @@ io.sockets.on('connection', function (socket) {
 
     //game start to initialize game start timestamp for bird
     socket.on('start-game', function(data) {
-        if (client_module.all[data] == undefined) client_module.add_new(data);
-        client_module.all[data].start_game_timestamp = new Date().getTime();
+        if (!client_module.client_exists(data.client_id)) client_module.add_new(data.username, data.client_id);
+
+        if (client_module.client_exists(data.client_id)) client_module.all[data.client_id].start_game_timestamp = new Date().getTime();
     });
 
     //on bird jump, re-emit
@@ -69,17 +77,19 @@ io.sockets.on('connection', function (socket) {
     	io.sockets.emit('bird-death-response', data.client_id);
     });
 
-    socket.on('client-update', function(data){
-        if (client_module.all[data.client_id] == undefined) client_module.add_new(data.client_id);
+    socket.on('client-update', function(data) {
+        if (!client_module.client_exists(data.client_id)) client_module.add_new(data.username, data.client_id);
 
-        var client = client_module.all[data.client_id];
+        if (client_module.client_exists(data.client_id)) {
+            var client = client_module.all[data.client_id];
 
-        if (typeof data.state !== "undefined") client.update_state(data.state);
-        else client.update_state();
+            if (typeof data.state !== "undefined") client.update_state(data.state);
+            else client.update_state();
 
-        if (typeof data.score !== "undefined") client.update_score(data.score);
+            if (typeof data.score !== "undefined") client.update_score(data.score);
 
-        console.log("STATE: " + client.state);
+            console.log("STATE: " + client.state);
+        }
     });
 
     refresh_client_list_service = setInterval(function () {

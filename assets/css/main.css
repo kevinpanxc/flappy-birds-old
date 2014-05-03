@@ -171,7 +171,7 @@ body {
    z-index: 20;
 }
 
-#loading-text {
+#loading-dialog {
    position: absolute;
    left: 50%;
    top: 50%;
@@ -192,7 +192,23 @@ body {
    z-index: 21;
 }
 
-#loading-bird {
+#loading-dialog > div {
+   display: none;
+}
+
+#loading-input-username input {
+   margin-top: -4px;
+   font-size: 22px;
+   font-weight: bold;
+   font-family: "Lato";
+   width: 53%;
+}
+
+#loading-input-username .error-messages {
+   display: none;
+}
+
+#loading-bird-image {
     display: inline-block;
     width: 34px;
     height: 24px;
