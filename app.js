@@ -31,7 +31,6 @@ io.sockets.on('connection', function (socket) {
         if (new_client !== false) {
             var return_package = { client_id : new_client.id, username : new_client.username, clients : client_module.all }
             socket.emit('register-success-response', return_package);
-            delete client_module.all[new_client.id];
         } else {
             socket.emit('register-failure-response', null);
         }
