@@ -1,7 +1,7 @@
 // express and sockets setup
 var express = require("express");
 var app = express();
-var port = Number(process.env.PORT || 5000);
+var port = Number(process.env.PORT || 3700);
 
 app.use(express.static(__dirname + '/assets'));
 app.get('/', function(request, response) {

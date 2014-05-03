@@ -104,8 +104,10 @@ var Game = (function () {
     var add_external_client_as_bird = function(data) {
         var new_bird = new Bird(data.id, data.username, false, data.velocity, data.y_position, data.rotation);
         // 6750 milliseconds is 900 pixels, which is just halfway through the client screen (will block bird)
-        if (data.time_diff >= 0 && data.time_diff < 6750) new_bird.add_to_fly_area(data.time_diff);
-        bird_array[data.id] = new_bird;
+        if (data.time_diff >= 0 && data.time_diff < 6750) {
+            new_bird.add_to_fly_area(data.time_diff);
+            bird_array[data.id] = new_bird;
+        }
     }
 
     var show_splash = function () {
@@ -339,7 +341,19 @@ var Game = (function () {
             });
 
             Network.on.bird_jumped(function(data) {
-                if (data !== bird.player_id && current_state == states.GAME_SCREEN) bird_array[data].jump();
+                if (data !== bird.player_id && current_state == states.GAME_SCREEN) {
+                    if (bird_array[data]) bird_array[data].jump();
+                }
+            });
+
+            Network.on.bird_death(function(data) {
+                if (data !== bird.player_id && current_state == states.GAME_SCREEN) {
+                    if (bird_array[data]) {
+                        Animator.end_bird_animations(data);
+                        bird_array[data].die();
+                        Animator.move_bird_back(data);
+                    }
+                }
             });
 
             Network.on.sync_success(function(data) {
@@ -352,14 +366,6 @@ var Game = (function () {
             Network.on.pipe_death_counter_info_returned(function(data) {
                 for (var i = 0; i < data.length; i++) {
                     Pipes.update_pipe_death_counter(data[i].index, data[i].death_counter);
-                }
-            });
-
-            Network.on.bird_death(function(data) {
-                if (data !== bird.player_id && current_state == states.GAME_SCREEN) {
-                    Animator.end_bird_animations(data);
-                    bird_array[data].die();
-                    Animator.move_bird_back(data);
                 }
             });
 
